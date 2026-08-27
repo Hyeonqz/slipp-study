@@ -10,7 +10,8 @@
     "prebuild": "fumadocs-mdx && tsc --noEmit && pnpm validate",
     "validate": "tsx scripts/validate-content.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "fumadocs-core": "^16.15.1",
@@ -22,6 +23,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",

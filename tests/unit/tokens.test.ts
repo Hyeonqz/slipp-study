@@ -4,10 +4,14 @@ import { readFileSync } from 'node:fs'
 const css = readFileSync('app/global.css', 'utf-8')
 
 describe('디자인 토큰', () => {
+  // --g600, --blue 값은 Task 13에서 axe-core 실측 대비 위반(AA 4.5:1 미달) 때문에
+  // 조정됐다: --g600 #6B7684→#5A6874(카드/서브내비 반투명 배경 위 4.3~4.4:1 미달 해결),
+  // --blue #3182F6→#1E5FCC(사이드바 "지금 여기" 라벨의 3.71:1, 활성 블루 배경 위 4.28:1
+  // 미달 해결). 자세한 계산은 app/global.css 해당 토큰 주석 참고.
   const required = [
     '--g50: #F9FAFB', '--g100: #F2F4F6', '--g200: #E5E8EB', '--g300: #D1D6DB',
-    '--g500: #8B95A1', '--g600: #6B7684', '--g700: #4E5968', '--g800: #333D4B',
-    '--g900: #191F28', '--blue: #3182F6', '--blue-bg: #E8F3FF',
+    '--g500: #8B95A1', '--g600: #5A6874', '--g700: #4E5968', '--g800: #333D4B',
+    '--g900: #191F28', '--blue: #1E5FCC', '--blue-bg: #E8F3FF',
     '--red: #F04452', '--green: #15C26B',
     '--stage-eye-bar: #C6D8F5', '--stage-hand-bar: #C2E6D2', '--stage-head-bar: #F5D9C2',
   ]
