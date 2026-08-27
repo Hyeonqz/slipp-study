@@ -32,7 +32,7 @@ export function ArchiveBoardView({ submissions }: { submissions: Submission[] })
         <p style={{ fontSize: 14, color: 'var(--g600)', margin: '8px 0 16px' }}>
           첫 번째로 올려보세요.
         </p>
-        <Link href="/templates/reverse-engineering" style={{ fontSize: 14, color: 'var(--blue)' }}>
+        <Link href="/archive#how-to-upload" style={{ fontSize: 14, color: 'var(--blue)' }}>
           올리는 법 보기 →
         </Link>
       </div>
