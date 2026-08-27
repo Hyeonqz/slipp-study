@@ -79,7 +79,7 @@ export function checkArchiveFrontmatter(file: string, fm: Record<string, unknown
  * positive)으로 떨어진다 — 고의 파손 검증 중 실제로 재현해서 발견한 문제.
  * `Date` 인스턴스는 UTC 구성요소로 `YYYY-MM-DD`를 복원해 이 문제를 없앤다.
  */
-function normalizeDateValue(v: unknown): string {
+export function normalizeDateValue(v: unknown): string {
   if (v instanceof Date) {
     const y = v.getUTCFullYear()
     const m = String(v.getUTCMonth() + 1).padStart(2, '0')
