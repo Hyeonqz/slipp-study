@@ -11,6 +11,7 @@ import { JourneyMap } from '@/components/visuals/journey-map'
 import { CurrentWeekBanner } from '@/components/ui/current-week-banner'
 import { WhyStudy } from '@/components/visuals/why-study'
 import { Roadmap } from '@/components/visuals/roadmap'
+import { ArchiveBoard } from '@/components/archive/archive-board'
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -26,6 +27,7 @@ export function getMDXComponents(components?: MDXComponents) {
     CurrentWeekBanner,
     WhyStudy,
     Roadmap,
+    ArchiveBoard,
     ...components,
   } satisfies MDXComponents
 }
