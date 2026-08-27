@@ -65,3 +65,27 @@ describe('<JourneyMap /> — 진행 중일 때', () => {
     expect(screen.getByText('이번 주')).toBeInTheDocument()
   })
 })
+
+/**
+ * Fix Round 1 — 리뷰 지적: 가로 스크롤 카드는 640px 프로즈 컬럼 안에서 8칸 중
+ * 3.5칸만 보여 "산출물이 다음 회차 재료가 되는 사슬"을 드러낸다는 컴포넌트의
+ * 존재 이유를 달성하지 못했다. 세로 타임라인 + 명시적 연결 문구로 재설계했다.
+ * 이 사슬 표시 자체를 검사하는 테스트가 없었으므로 여기서 추가한다.
+ */
+describe('<JourneyMap /> — 회차 사이 사슬 연결', () => {
+  it('회차 사이마다 산출물→다음 회차 재료 연결 문구를 보여준다 (8회차면 7개)', () => {
+    render(<JourneyMap />)
+    const connectors = screen.getAllByText(/^\d회차 산출물이 \d회차 재료가 돼요$/)
+    expect(connectors).toHaveLength(curriculum.length - 1)
+  })
+
+  it('1회차 산출물이 2회차 재료가 된다는 연결을 명시한다', () => {
+    render(<JourneyMap />)
+    expect(screen.getByText('1회차 산출물이 2회차 재료가 돼요')).toBeInTheDocument()
+  })
+
+  it('마지막 회차 뒤에는 연결 문구가 없다', () => {
+    render(<JourneyMap />)
+    expect(screen.queryByText(/8회차 산출물이/)).not.toBeInTheDocument()
+  })
+})
