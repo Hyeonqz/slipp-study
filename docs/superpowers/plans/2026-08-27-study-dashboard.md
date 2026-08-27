@@ -1584,6 +1584,9 @@ export const glossary: GlossaryEntry[] = [
     term: 'PRD',
     definition:
       'Product Requirements Document. "이걸 왜, 누구를 위해, 뭘 만들 건지" 적은 기획 문서. 기획자의 기본 산출물',
+    // 원본 README 표는 이 자리에 "5장에 예시 있음"이라고 적혀 있었다. 장 번호는 분할 이후
+    // 존재하지 않으므로, 지금 실제로 그 내용이 있는 곳을 말로 가리킨다.
+    example: '양식과 채운 예시는 "양식 · 예시" 그룹의 PRD 양식 문서에 있습니다',
   },
   {
     term: '타겟',
