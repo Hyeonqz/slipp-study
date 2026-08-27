@@ -3,10 +3,11 @@ import { RootProvider } from 'fumadocs-ui/provider/next'
 import { DocsLayout } from 'fumadocs-ui/layouts/docs'
 import { source } from '@/lib/source'
 import { baseOptions } from './layout.config'
+import { pretendard } from './fonts'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" className={pretendard.variable} suppressHydrationWarning>
       <body>
         <RootProvider>
           <DocsLayout tree={source.getPageTree()} {...baseOptions()}>

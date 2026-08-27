@@ -1,3 +1,111 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
+
+/* ---------------------------------------------------------------------
+ * Toss design tokens
+ * 색 사용 규칙: --blue 는 "지금 여기"에만(현재 회차/현재 TOC 항목/링크/숙제 카드).
+ * 단계 틴트는 여정 맵의 바·칩 전용. --g500 은 텍스트로 쓰지 않는다(보조 텍스트 하한 --g600).
+ * ------------------------------------------------------------------- */
+:root {
+  /* 그레이스케일 */
+  --g50: #F9FAFB;  --g100: #F2F4F6; --g200: #E5E8EB; --g300: #D1D6DB;
+  --g500: #8B95A1; --g600: #6B7684; --g700: #4E5968; --g800: #333D4B;
+  --g900: #191F28;
+
+  /* 액센트 */
+  --blue: #3182F6; --blue-bg: #E8F3FF;
+  --red: #F04452;  --green: #15C26B;
+
+  /* 단계 틴트 — JourneyMap 바와 단계 칩에서만 사용 */
+  --stage-eye-bar: #C6D8F5;  --stage-eye-chip-bg: #E8F1FC;  --stage-eye-chip-fg: #2C5FA8;
+  --stage-hand-bar: #C2E6D2; --stage-hand-chip-bg: #E3F5EA; --stage-hand-chip-fg: #1E7A4C;
+  --stage-head-bar: #F5D9C2; --stage-head-chip-bg: #FCEDE0; --stage-head-chip-fg: #9C5A26;
+
+  /* 반경 */
+  --r-card: 16px; --r-block: 10px; --r-item: 8px; --r-pill: 999px;
+}
+
+.dark {
+  --g50: #1E1E24;  --g100: #24242C; --g200: #2E2E38; --g300: #3A3A46;
+  --g500: #7C848F; --g600: #98A0AB; --g700: #C2C8D0; --g800: #DDE1E6;
+  --g900: #F2F4F6;
+
+  --blue: #4E93F7; --blue-bg: #1B2B45;
+  --red: #F4707C;  --green: #3ED18C;
+
+  /* 단계 틴트 — 라이트 값의 채도를 낮춘 다크 버전 */
+  --stage-eye-bar: #35507A;  --stage-eye-chip-bg: #1C2A40;  --stage-eye-chip-fg: #9DBDEA;
+  --stage-hand-bar: #2E5A44; --stage-hand-chip-bg: #162C22; --stage-hand-chip-fg: #8FD3AE;
+  --stage-head-bar: #6B4A30; --stage-head-chip-bg: #332215; --stage-head-chip-fg: #E0AE85;
+}
+
+/* ---------------------------------------------------------------------
+ * Fumadocs 변수 매핑 — 실제 변수 목록은
+ * node_modules/fumadocs-ui/css/lib/default-colors.css 에서 확인했다:
+ *   --color-fd-background / -foreground / -muted / -muted-foreground /
+ *   -popover / -popover-foreground / -card / -card-foreground / -border /
+ *   -primary / -primary-foreground / -secondary / -secondary-foreground /
+ *   -accent / -accent-foreground / -ring / -overlay
+ *
+ * --color-fd-accent 는 사이드바·버튼·카드·드롭다운 등 "모든 hover" 하이라이트에
+ * 범용으로 쓰인다(브리프 예시처럼 --blue-bg 로 매핑하면 blue가 hover 전역에 번짐 →
+ * "blue는 지금 여기에만" 규칙 위반). 그래서 accent 는 중립(--g100)으로,
+ * "지금 여기"는 --color-fd-primary(=--blue, 현재 TOC 항목·현재 사이드바 항목·
+ * 활성 탭·현재 페이지 breadcrumb·prose 링크에서만 실제로 쓰인다)로 분리했다.
+ * ------------------------------------------------------------------- */
+:root {
+  --color-fd-background: #FFFFFF;
+  --color-fd-foreground: var(--g900);
+  --color-fd-muted: var(--g100);
+  --color-fd-muted-foreground: var(--g600);
+  --color-fd-popover: var(--g50);
+  --color-fd-popover-foreground: var(--g900);
+  --color-fd-card: var(--g50);
+  --color-fd-card-foreground: var(--g900);
+  --color-fd-border: var(--g200);
+  --color-fd-primary: var(--blue);
+  --color-fd-primary-foreground: #FFFFFF;
+  --color-fd-secondary: var(--g100);
+  --color-fd-secondary-foreground: var(--g900);
+  --color-fd-accent: var(--g100);
+  --color-fd-accent-foreground: var(--g900);
+  --color-fd-ring: var(--blue);
+}
+
+.dark {
+  --color-fd-background: #17171C;
+}
+
+/* neutral.css 가 `.dark #nd-sidebar` 에서 muted/secondary 를 id-선택자로
+   재정의하므로(specificity 1,1,0), 동일 specificity로 다시 우리 토큰을 적용한다. */
+.dark #nd-sidebar {
+  --color-fd-muted: var(--g100);
+  --color-fd-secondary: var(--g100);
+  --color-fd-muted-foreground: var(--g600);
+}
+
+/* ---------------------------------------------------------------------
+ * 타이포 — Pretendard, 한글 자간, 숫자 정렬
+ * ------------------------------------------------------------------- */
+body {
+  font-family: var(--font-pretendard), -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  letter-spacing: -0.02em;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { letter-spacing: -0.03em; font-weight: 800; }
+
+time, .tabular { font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------------
+ * 표면 — 토스 원칙: border/box-shadow 대신 배경 블록으로 영역을 나눈다.
+ * #nd-sidebar 는 fumadocs-ui/dist/layouts/docs/slots/sidebar.js 에서
+ * 실제로 `border-e`(및 접힘 상태의 `border`) 클래스가 붙는 것을 확인했다.
+ * 여기서 border-color 를 지워 사이드바-본문 경계를 --color-fd-card(--g50)
+ * 배경 차이만으로 표현한다. #nd-toc 는 기본적으로 border 클래스가 없어
+ * 별도 처리가 필요 없다(toc.js 확인).
+ * ------------------------------------------------------------------- */
+#nd-sidebar {
+  border-color: transparent;
+}
