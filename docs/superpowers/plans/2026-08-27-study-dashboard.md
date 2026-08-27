@@ -3451,16 +3451,17 @@ git commit -m "test: add responsive and accessibility E2E coverage"
 
 ---
 
-## Task 14: 중복 원본 정리 · README 축소 · 배포
+## Task 14: 중복 원본 정리 · README 축소 · 배포 준비 · push
 
 **Files:**
 - Delete: `weeks/`, `notion/01~08.md`, `notion/09-ai-playbook.md`
+- Create: `docs/DEPLOY.md`
 - Modify: `README.md`, `docs/superpowers/specs/2026-08-27-study-dashboard-design.md`
 - Keep: `notion/00-proposal.md`
 
 **Interfaces:**
 - Consumes: Task 1~13 전부
-- Produces: 배포된 Vercel URL
+- Produces: GitHub에 push된 `main` + `docs/DEPLOY.md` (Vercel 연결과 study.calix.kr DNS 설정은 저장소 소유자가 수행)
 
 - [ ] **Step 1: 마이그레이션 누락 확인**
 
@@ -3572,39 +3573,94 @@ git add -A
 git commit -m "chore: remove duplicated sources, shrink README to repo guide, sync spec"
 ```
 
-- [ ] **Step 7: GitHub 저장소 생성 및 push**
 
-```bash
-gh repo create slipp-study --public --source=. --remote=origin --push
-```
+- [ ] **Step 7: 배포·도메인 안내 문서 작성**
 
-`gh`가 없으면 GitHub에서 빈 저장소를 만들고:
+Vercel 연결과 DNS 설정은 **저장소 소유자가 직접** 한다 (계정 접근이 필요하므로). 대신 그대로 따라 할 수 있는 문서를 남긴다.
 
-```bash
-git remote add origin https://github.com/<사용자>/slipp-study.git
-git push -u origin main
-```
+`docs/DEPLOY.md`:
 
-- [ ] **Step 8: Vercel 연결**
+```markdown
+# 배포 · 도메인 연결
 
-1. https://vercel.com/new 에서 방금 만든 저장소를 Import
+사이트 주소: **https://study.calix.kr**
+
+## 1. Vercel 프로젝트 연결 (최초 1회)
+
+1. https://vercel.com/new 에서 이 저장소를 **Import**
 2. Framework Preset이 **Next.js**로 자동 인식되는지 확인
-3. Build Command / Output Directory는 기본값 그대로 (`pnpm build`가 `prebuild`를 자동 실행한다)
-4. Deploy
+3. Build Command / Output Directory / Install Command 전부 **기본값 그대로** 둔다
+   - `pnpm build`가 `prebuild`(타입 검사 + 콘텐츠 검증)를 자동으로 먼저 실행한다
+4. **Deploy**
 
-- [ ] **Step 9: 배포 검증**
+배포가 끝나면 `<프로젝트명>.vercel.app` 주소가 나온다. 도메인을 붙이기 전에 이 주소로 먼저 확인한다.
 
-배포 URL에서 확인한다.
+## 2. study.calix.kr 연결
 
-1. 사이드바 5그룹이 스펙 순서대로 보인다
-2. `/weeks/04-prd`에서 3열 레이아웃, 배지, 숙제 카드가 보인다
-3. 폰 또는 개발자 도구 360px에서 가로 스크롤이 없다
-4. `/archive`에서 예시 제출물 1건과 나머지 회차 "아직 없어요"가 보인다
-5. 검색창에 `역기획`, `기획`, `PRD`를 각각 넣어본다 — **스펙 §10의 한국어 검색 리스크를 여기서 판정한다.** `기획`으로 `역기획` 문서가 안 잡히면 이슈로 남기고 Pagefind 교체를 별도 태스크로 잡는다
+### 2-1. Vercel에 도메인 등록
 
-- [ ] **Step 10: PR 흐름 검증**
+1. 프로젝트 → **Settings → Domains**
+2. `study.calix.kr` 입력 후 **Add**
+3. Vercel이 **CNAME 값**을 보여준다 (보통 `cname.vercel-dns.com`)
+   - ⚠️ **화면에 표시된 값을 그대로 쓴다.** Vercel이 값을 바꾸는 경우가 있으므로
+     이 문서에 적힌 값이 아니라 대시보드 값이 기준이다
 
-실제로 한 번 돌려본다.
+### 2-2. 메가존클라우드 DNS에 CNAME 추가
+
+도메인 관리 콘솔에서 `calix.kr`의 DNS 레코드에 추가한다.
+
+| 항목 | 값 |
+|---|---|
+| 타입 | `CNAME` |
+| 호스트 / 이름 | `study` (또는 `study.calix.kr` — 콘솔 형식에 따라 다름) |
+| 값 / 대상 | Vercel이 알려준 값 (예: `cname.vercel-dns.com`) |
+| TTL | 기본값 (300~3600) |
+
+> **왜 apex(`calix.kr`)가 아니라 서브도메인인가**
+> DNS 표준상 apex 도메인에는 CNAME과 다른 레코드(NS, SOA 등)가 공존할 수 없다.
+> apex에 붙이려면 A 레코드(`76.76.21.21`)를 써야 한다.
+> `study.calix.kr`은 서브도메인이라 CNAME이 정석이고, Vercel이 IP를 바꿔도 따라간다.
+
+### 2-3. 확인
+
+DNS 전파에 보통 몇 분~최대 몇 시간 걸린다.
+
+```bash
+nslookup study.calix.kr
+# 또는
+dig study.calix.kr CNAME +short
+```
+
+Vercel Settings → Domains에서 `study.calix.kr` 옆이 **Valid Configuration**이 되고,
+HTTPS 인증서가 자동 발급되면 끝이다.
+
+## 3. 이후 배포
+
+손댈 것이 없다.
+
+- `main`에 push → 프로덕션(`study.calix.kr`) 자동 갱신
+- PR 생성 → Preview URL 자동 생성 (머지 전 확인용)
+- 빌드가 실패하면 배포되지 않는다 — 잘못된 frontmatter가 프로덕션에 올라갈 수 없다
+
+## 4. 팀원에게 저장소 열어주기
+
+GitHub 저장소 → **Settings → Collaborators** → 팀원 계정 추가.
+팀원이 할 일은 저장소 `README.md`의 "산출물 올리는 법"에 있다.
+
+## 5. 배포 후 확인 체크리스트
+
+- [ ] `study.calix.kr` 접속 시 사이드바 5그룹이 순서대로 보인다
+      (`시작하기` / `진행 방식` / `회차` / `양식 · 예시` / `아카이브`)
+- [ ] `/weeks/04-prd` — 3열 레이아웃, 회차 배지, 파란 숙제 카드
+- [ ] 폰 또는 개발자 도구 360px — 가로 스크롤 없음, 사이드바가 드로어로 접힘
+- [ ] `/archive` — 예시 제출물 1건, 나머지 회차는 "아직 없어요"
+- [ ] `/start/why`, `/start/roadmap` — "작성 예정" 상태로 레이아웃이 멀쩡함
+- [ ] 검색창에 `역기획` / `기획` / `PRD` 를 각각 넣어본다
+      → `기획`으로 `역기획` 문서가 안 잡히면 한국어 검색 이슈다 (설계 문서 §10).
+        이슈로 남기고 Pagefind 교체를 별도 작업으로 잡는다
+- [ ] 아카이브 PR을 한 번 시험해본다 (아래)
+
+## 6. 아카이브 PR 흐름 시험
 
 ```bash
 git switch -c test/archive-flow
@@ -3621,29 +3677,58 @@ PR 흐름 확인용 문서입니다.
 EOF
 git add -A && git commit -m "test: verify archive PR flow"
 git push -u origin test/archive-flow
-gh pr create --fill
 ```
 
 확인할 것:
+
 1. PR에 Vercel Preview 링크가 자동으로 붙는다
-2. Preview에서 `/archive`에 1회차 아래 새 문서가 보인다
-3. `week: 99`로 고쳐 push하면 Vercel 빌드가 **실패**한다
+2. Preview의 `/archive`에 1회차 아래 새 문서가 보인다
+3. `week: 99`로 고쳐 push하면 **Vercel 빌드가 실패한다** (검증 게이트 동작 확인)
 
-확인 후 PR과 브랜치를 닫는다.
-
-```bash
-gh pr close test/archive-flow --delete-branch
+확인이 끝나면 PR과 브랜치를 닫는다.
 ```
 
-- [ ] **Step 11: 최종 커밋**
+`README.md`의 사이트 주소 자리(`https://<배포주소>`)를 `https://study.calix.kr`로 채우고, 배포 절차는 `docs/DEPLOY.md` 링크로 넘긴다.
+
+- [ ] **Step 8: 전체 검증**
 
 ```bash
-git switch main
-git commit --allow-empty -m "chore: verify deployment and archive PR flow"
-git push
+pnpm build && pnpm test && pnpm test:e2e
 ```
 
----
+Expected: 전부 통과. `pnpm validate`가 깨진 링크를 잡으면 — README 축소로 사라진 경로를 참조하는 문서가 있는 것이므로 고친다.
+
+- [ ] **Step 9: 커밋**
+
+```bash
+git add -A
+git commit -m "chore: remove duplicated sources, shrink README, add deploy guide"
+```
+
+- [ ] **Step 10: GitHub 저장소 생성 및 push**
+
+저장소 소유자가 이 단계를 명시적으로 허가했다.
+
+```bash
+gh repo create slipp-study --public --source=. --remote=origin --push
+```
+
+`gh`가 없거나 인증되어 있지 않으면 — GitHub에서 빈 저장소를 만든 뒤:
+
+```bash
+git remote add origin https://github.com/<사용자>/slipp-study.git
+git push -u origin main
+```
+
+push 후 확인:
+
+```bash
+git remote -v
+git log --oneline -1
+gh repo view --web   # 또는 브라우저에서 저장소 확인
+```
+
+**Vercel 연결과 DNS 설정은 여기서 하지 않는다.** `docs/DEPLOY.md`를 저장소 소유자에게 넘기고 종료한다.
 
 ## 자체 검토
 
