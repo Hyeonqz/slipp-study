@@ -31,7 +31,7 @@ describe('<WhyStudy />', () => {
   it('진단과 설계 결정 내용이 화면에 나온다', () => {
     render(<WhyStudy />)
     expect(screen.getByText(/만들 줄 아는 게 오히려 함정/)).toBeInTheDocument()
-    expect(screen.getByText(/시장 분석 → 프로덕트·서비스 기획/)).toBeInTheDocument()
+    expect(screen.getByText(/시장 분석 → 프로덕트 기획 → 서비스 기획/)).toBeInTheDocument()
   })
 
   it('빈 본문으로도 레이아웃이 깨지지 않는다 — 각 칸이 항상 렌더링된다', () => {
