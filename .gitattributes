@@ -1,0 +1,17 @@
+# 텍스트 파일은 저장소(blob)에 LF로 저장하고, 워킹트리에도 LF로 체크아웃한다.
+# `text=auto`만 두면 core.autocrlf=true인 Windows에서는 체크아웃 시 여전히
+# CRLF로 풀린다 — `eol=lf`가 그걸 막는 실제 지점이다.
+* text=auto eol=lf
+
+# 진짜 바이너리 자산은 git이 줄바꿈 변환을 시도하지 않도록 명시한다.
+*.woff2 binary
+*.woff binary
+*.ttf binary
+*.otf binary
+*.eot binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
