@@ -2963,10 +2963,26 @@ git commit -m "feat: add WhyStudy and Roadmap visualizations with draft placehol
 - Test: `tests/unit/archive.test.ts`, `tests/unit/archive-board.test.tsx`
 
 **Interfaces:**
-- Consumes: Task 1 `source`, Task 3 `curriculum`, Task 4 `source.config.ts`의 `ARCHIVE_TYPES`
+- Consumes: Task 1 `source`, Task 3 `curriculum`, Task 4 `content/data/archive-types.ts`의 `ARCHIVE_TYPES`
 - Produces:
-  - `lib/archive.ts` → `export interface Submission { url: string; title: string; week: number; author: string; type: string; date: string }`, `export function collectSubmissions(): Submission[]`, `export function groupByWeek(subs: Submission[]): { week: number; items: Submission[] }[]`, `export function groupByAuthor(subs: Submission[]): { author: string; items: Submission[] }[]`
+  - `lib/archive.ts` → `export interface Submission { url: string; title: string; week: number; author: string; type: string; date: string }`, `export function groupByWeek(subs: Submission[]): { week: number; items: Submission[] }[]`, `export function groupByAuthor(subs: Submission[]): { author: string; items: Submission[] }[]`
+  - `lib/archive-source.ts` → `export function collectSubmissions(): Submission[]`
   - `export function ArchiveBoard(): JSX.Element`
+
+> ### ⚠️ 아래 코드보다 우선하는 두 가지 결정
+>
+> **1. `lib/archive.ts`를 둘로 나눈다.** 아래 Step 3 코드는 `lib/archive.ts` 안에서 `@/lib/source`를 최상위 import 하는데, 그러면 `groupByWeek`/`groupByAuthor` 단위 테스트가 Fumadocs 빌드 산출물(`.source/`)에 의존하게 된다. 순수 함수 테스트가 빌드 산출물을 요구해서는 안 된다.
+>
+> - `lib/archive.ts` — `Submission` 타입과 순수 함수 `groupByWeek`·`groupByAuthor` 만. **`@/lib/source`를 import 하지 않는다.** `curriculum` import는 괜찮다(순수 데이터)
+> - `lib/archive-source.ts` — `collectSubmissions()` 만. 여기서 `@/lib/source`를 import 한다
+> - `components/archive/archive-board.tsx`의 `ArchiveBoard()`는 `archive-source`에서 `collectSubmissions`를, `archive.ts`에서 타입과 그룹핑 함수를 가져온다
+>
+> **2. `ArchiveBoardView`와 `ArchiveFilters`의 역할을 미리 확정한다.** 아래 Step 4는 회차별 목록을 `ArchiveBoardView`에 넣고, Step 5의 주석이 그걸 다시 `ArchiveFilters`로 옮기라고 한다. 최종 구조를 두 번 읽지 말고 처음부터 이렇게 만든다:
+>
+> - `ArchiveBoardView(props)` — 제출물이 0개면 빈 상태를 렌더하고 끝낸다. 0개가 아니면 `<ArchiveFilters submissions={...} />` **하나만** 렌더한다
+> - `ArchiveFilters` — 클라이언트 컴포넌트. 회차별(기본)과 작성자별 **두 뷰를 모두 소유**한다. Step 4의 `groupByWeek(...)` 렌더링 블록이 여기 `{!byAuthor && (...)}` 자리로 들어간다
+>
+> Step 5 끝의 인용 주석은 이 결정으로 대체된다 — 따로 읽지 않아도 된다.
 
 - [ ] **Step 1: 실패하는 테스트 작성**
 
