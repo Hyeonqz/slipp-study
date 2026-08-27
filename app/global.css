@@ -109,3 +109,13 @@ time, .tabular { font-variant-numeric: tabular-nums; }
 #nd-sidebar {
   border-color: transparent;
 }
+
+/* ---------------------------------------------------------------------
+ * 본문 최대 폭 640px — fumadocs-ui/dist/layouts/docs/page/slots/container.js 에서
+ * 실제 본문 컨테이너가 `<article id="nd-page" class="... max-w-[900px] ...">`
+ * (breadcrumb + DocsBody(prose) + footer 를 감싸는 실제 읽기 컬럼)임을 확인했다.
+ * body 전체가 아니라 이 컨테이너에만 적용해 사이드바 등 레이아웃 크롬은 건드리지 않는다.
+ * ------------------------------------------------------------------- */
+#nd-page {
+  max-width: 640px;
+}
