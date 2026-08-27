@@ -1284,7 +1284,7 @@ main()
 {
   "scripts": {
     "validate": "tsx scripts/validate-content.ts",
-    "prebuild": "tsc --noEmit && pnpm validate"
+    "prebuild": "fumadocs-mdx && tsc --noEmit && pnpm validate"
   }
 }
 ```
