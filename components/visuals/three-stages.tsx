@@ -8,6 +8,14 @@ import { STAGES } from '@/lib/stage'
  *
  * 단계 틴트(색)는 여정 맵의 바·칩 전용 규칙이라 여기서는 --g50 회색 카드를 쓴다.
  * 단계 구분은 이모지 + 라벨로 한다.
+ *
+ * 세로 스택으로 렌더링한다 (가로 그리드가 아니다). `repeat(auto-fit, minmax(Npx, 1fr))`로
+ * "데스크톱 3칸 → 좁은 화면 세로 스택"을 미디어 쿼리 없이 구현하면, 본문 컬럼이 640px로
+ * 고정된 이 문서에서 사이드바가 걸치는 중간 너비(예: 400~480px, 768px 부근)마다 "2+1"로
+ * 깨지는 지점이 실측으로 확인됐다 — 3칸에 맞을 만큼 min-width를 낮추면 이번엔 데스크톱
+ * 텍스트가 너무 좁아진다. 이 컴포넌트가 보여주는 눈→손→머리는 순서가 논지 그 자체라
+ * 어중간한 폭에서 대열이 끊기는 걸 감수할 수 없어서, 모든 폭에서 결정론적으로 한 줄씩
+ * 쌓이는 세로 스택으로 확정했다 (`<TwoHourBlock />`과 같은 이유).
  */
 const DETAIL: Record<string, { doing: string; cooking: string; ifOnly: string }> = {
   eye: {
@@ -31,8 +39,8 @@ export function ThreeStages() {
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        display: 'flex',
+        flexDirection: 'column',
         gap: 10,
         margin: '20px 0',
       }}
@@ -48,12 +56,12 @@ export function ThreeStages() {
               padding: '16px 18px',
             }}
           >
-            <div style={{ fontSize: 26 }}>{s.emoji}</div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--g900)', marginTop: 4 }}>
-              {s.label}
-            </div>
-            <div style={{ fontSize: 12.5, color: 'var(--g600)' }} className="tabular">
-              {s.range}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 26 }}>{s.emoji}</span>
+              <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--g900)' }}>{s.label}</span>
+              <span className="tabular" style={{ fontSize: 12.5, color: 'var(--g600)' }}>
+                {s.range}
+              </span>
             </div>
             <p style={{ fontSize: 14.5, color: 'var(--g700)', marginTop: 10, lineHeight: 1.7 }}>
               {d.doing}
