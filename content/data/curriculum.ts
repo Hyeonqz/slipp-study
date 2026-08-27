@@ -1,0 +1,84 @@
+export type Stage = 'eye' | 'hand' | 'head'
+
+export interface Week {
+  no: number
+  stage: Stage
+  slug: string
+  title: string
+  /** 이번 시간에 하는 것 */
+  headline: string
+  /** 다음 시간까지 만들어 올 것 */
+  deliverable: string
+  /** 미리 볼 것 (무료) */
+  preread?: string[]
+}
+
+/**
+ * 8회차 커리큘럼의 단일 원천.
+ *
+ * README.md 3장 "8회차 한눈에 보기" 표 + "8회차 상세 계획"의 1단/2단/3단 표에서
+ * 옮겨 적었다. 커리큘럼이 바뀌면 이 배열 하나만 고치면 된다 — README는 문서로서
+ * 남아있지만, 사이트에 나타나는 값은 전부 여기서 나온다.
+ */
+export const curriculum: Week[] = [
+  {
+    no: 1, stage: 'eye', slug: '01-kickoff', title: '킥오프',
+    headline: 'OT + "이 기능은 왜 있을까" 워밍업',
+    deliverable: '역기획 ① + 예측 봉인',
+  },
+  {
+    no: 2, stage: 'eye', slug: '02-reverse-planning-1', title: '어떻게 돈을 버나',
+    headline: '역기획 ① — 어떻게 돈을 버나 (BM 발표 + 반박, DART 같이 열어보기)',
+    deliverable: '역기획 ② (같은 시장 승자/패자 비교)',
+    preread: ['SVPG 블로그 글 2편', 'DART에서 대상 회사 감사보고서'],
+  },
+  {
+    no: 3, stage: 'eye', slug: '03-reverse-planning-2', title: '봉인 개봉',
+    headline: '역기획 ② — 예측 봉인 개봉 / AI 프로덕트 역기획',
+    deliverable: 'PRD 1장',
+    preread: ['Blake Masters CS183 노트 1~5강', 'Google PAIR 가이드북'],
+  },
+  {
+    no: 4, stage: 'hand', slug: '04-prd', title: '문제 정의 + PRD',
+    headline: '문제 정의 + PRD 상호 리뷰 / 인터뷰 질문지 제작',
+    deliverable: '실제 사람 3~5명 인터뷰 + 기록',
+    preread: ['SVPG "Product Discovery"', 'The Mom Test 저자 강연'],
+  },
+  {
+    no: 5, stage: 'hand', slug: '05-user-interview', title: '유저 인터뷰',
+    headline: '유저 인터뷰 결과 + 유도질문 잡아내기',
+    deliverable: '지표 트리 + 우선순위 판단서 (RICE)',
+    preread: ['요즘IT 그로스 아티클 1편'],
+  },
+  {
+    no: 6, stage: 'hand', slug: '06-metrics-priority', title: '지표 · 우선순위',
+    headline: '지표 설계 + 우선순위 / 아이디어 브레인스토밍',
+    deliverable: '원페이저 + 검증 착수',
+    preread: ["Lenny's Newsletter 무료글 1편"],
+  },
+  {
+    no: 7, stage: 'head', slug: '07-my-idea', title: '내 아이디어',
+    headline: '내 아이디어 — 전원 공격',
+    deliverable: '검증 실행 결과 + 계속할까 접을까 결론',
+    preread: ['YC "How to talk to users"', '벤 호로위츠 강연'],
+  },
+  {
+    no: 8, stage: 'head', slug: '08-validation-retro', title: '검증 결과 + 회고',
+    headline: '검증 결과 발표 + 8주 전체 회고',
+    deliverable: '없음 — 뒤풀이',
+  },
+]
+
+/**
+ * 지금 진행 중인 회차. 스터디 시작 전이면 null.
+ *
+ * 진행자가 매주 손으로 고치는 값이다. 날짜 기반 자동 계산을 넣지 않는다 —
+ * 일정은 밀리는 게 정상이고, 자동화하면 틀린 값이 화면에 뜬다.
+ *
+ * 이 값 하나가 사이드바 `이번 주` 배지 · 홈 배너 · 여정 맵 현재 위치 마커를 만든다.
+ */
+export const currentWeek: number | null = null
+
+export function weekBySlug(slug: string): Week | undefined {
+  return curriculum.find((w) => w.slug === slug)
+}
