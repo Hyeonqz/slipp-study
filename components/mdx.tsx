@@ -9,6 +9,8 @@ import { ThreeStages } from '@/components/visuals/three-stages'
 import { TwoHourBlock } from '@/components/visuals/two-hour-block'
 import { JourneyMap } from '@/components/visuals/journey-map'
 import { CurrentWeekBanner } from '@/components/ui/current-week-banner'
+import { WhyStudy } from '@/components/visuals/why-study'
+import { Roadmap } from '@/components/visuals/roadmap'
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -22,6 +24,8 @@ export function getMDXComponents(components?: MDXComponents) {
     TwoHourBlock,
     JourneyMap,
     CurrentWeekBanner,
+    WhyStudy,
+    Roadmap,
     ...components,
   } satisfies MDXComponents
 }
