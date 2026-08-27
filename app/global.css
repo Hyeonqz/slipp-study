@@ -17,6 +17,9 @@
   --blue: #3182F6; --blue-bg: #E8F3FF;
   --red: #F04452;  --green: #15C26B;
 
+  /* Callout(경고) 배경 — <Callout type="warn">에서만 사용 */
+  --warn-bg: #FEF0F1;
+
   /* 단계 틴트 — JourneyMap 바와 단계 칩에서만 사용 */
   --stage-eye-bar: #C6D8F5;  --stage-eye-chip-bg: #E8F1FC;  --stage-eye-chip-fg: #2C5FA8;
   --stage-hand-bar: #C2E6D2; --stage-hand-chip-bg: #E3F5EA; --stage-hand-chip-fg: #1E7A4C;
@@ -33,6 +36,10 @@
 
   --blue: #4E93F7; --blue-bg: #1B2B45;
   --red: #F4707C;  --green: #3ED18C;
+
+  /* Callout(경고) 배경 — 다크 팔레트와 어울리는 어두운 적색 계열.
+   * #3A2226 위 --g800(#DDE1E6) 텍스트 대비비 ≈ 11.1:1 (AAA) */
+  --warn-bg: #3A2226;
 
   /* 단계 틴트 — 라이트 값의 채도를 낮춘 다크 버전 */
   --stage-eye-bar: #35507A;  --stage-eye-chip-bg: #1C2A40;  --stage-eye-chip-fg: #9DBDEA;
