@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "prebuild": "fumadocs-mdx && tsc --noEmit",
+    "prebuild": "fumadocs-mdx && tsc --noEmit && pnpm validate",
+    "validate": "tsx scripts/validate-content.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -30,9 +31,12 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^6.1.0",
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
     "jsdom": "^30.0.1",
     "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.12",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11"
   }
