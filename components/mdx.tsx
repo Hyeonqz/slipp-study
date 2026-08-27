@@ -7,6 +7,8 @@ import { Homework } from '@/components/ui/homework'
 import { Callout } from '@/components/ui/callout'
 import { ThreeStages } from '@/components/visuals/three-stages'
 import { TwoHourBlock } from '@/components/visuals/two-hour-block'
+import { JourneyMap } from '@/components/visuals/journey-map'
+import { CurrentWeekBanner } from '@/components/ui/current-week-banner'
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -18,6 +20,8 @@ export function getMDXComponents(components?: MDXComponents) {
     Callout,
     ThreeStages,
     TwoHourBlock,
+    JourneyMap,
+    CurrentWeekBanner,
     ...components,
   } satisfies MDXComponents
 }
