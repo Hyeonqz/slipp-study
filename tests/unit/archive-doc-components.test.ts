@@ -84,3 +84,36 @@ describe('content/docs/archive/index.mdx에 "올리는 법" 섹션이 있고, �
     expect(raw).not.toMatch(/README/)
   })
 })
+
+/**
+ * Fix Wave finding 3: 참가자는 기획 초심자라 본문에 `<로그인 버튼>`, `{ 3만원 }`
+ * 처럼 꺾쇠·중괄호가 든 한국어 문장을 자연스럽게 쓴다. 이건 순수 마크다운이
+ * 아니라 MDX라서 그런 문장이 태그/코드 표현식으로 오인돼 빌드가 깨지거나
+ * (`<로그인 버튼>`), 조용히 컴파일됐다가 정적 생성 중에야 죽는다(`{유저명}`).
+ * "올리는 법" 섹션에 이 경고가 실제로 있는지 단언해, 나중에 문구가 조용히
+ * 지워지는 회귀를 막는다.
+ */
+describe('content/docs/archive/index.mdx에 MDX 특수문자 경고가 실제로 있다', () => {
+  it('MDX라서 `<`, `{`가 특별하다는 경고 문구를 갖는다', () => {
+    const raw = readDoc('content/docs/archive/index.mdx')
+    expect(raw).toMatch(/MDX/)
+    expect(raw).toMatch(/`<`/)
+    expect(raw).toMatch(/`\{`/)
+  })
+
+  it('이스케이프(`\\<`, `\\{`) 또는 백틱으로 감싸라는 구체적 해결법을 갖는다', () => {
+    const raw = readDoc('content/docs/archive/index.mdx')
+    expect(raw).toMatch(/\\</)
+    expect(raw).toMatch(/\\\{/)
+    expect(raw).toMatch(/백틱/)
+  })
+})
+
+describe('README.md 산출물 올리는 법에도 MDX 경고가 짧게 반영되어 있다', () => {
+  it('README.md가 MDX 특수문자 경고를 갖는다', () => {
+    const raw = readFileSync('README.md', 'utf-8')
+    expect(raw).toMatch(/MDX/)
+    expect(raw).toMatch(/`<`/)
+    expect(raw).toMatch(/`\{`/)
+  })
+})
