@@ -28,4 +28,9 @@ describe('start/roadmap.mdx에 <Roadmap />이 실제로 삽입되어 있다', ()
     const raw = readDoc('roadmap')
     expect(raw).toMatch(/<Roadmap\s*\/>/)
   })
+
+  it('<StudyArc />도 갖는다 — 8주가 어떤 모양인지 보여주는 조감도', () => {
+    const raw = readDoc('roadmap')
+    expect(raw).toMatch(/<StudyArc\s*\/>/)
+  })
 })

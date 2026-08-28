@@ -25,7 +25,11 @@ export function WeekHeader({ week }: { week: number }) {
 
   return (
     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '0 0 16px' }}>
-      <span style={badge} className="tabular">{week}회차</span>
+      {/* 회차 번호 배지는 두지 않는다 — 문서 제목(frontmatter title)이 이미
+          `N회차 — 제목` 형식이라(content/data/curriculum.ts weekLabel 참고)
+          바로 위 H1 과 글자 그대로 겹친다. 여기 남는 건 제목이 말해주지 않는
+          정보(단계, 소요 시간)뿐이다. `week` prop 은 여전히 단계 판정에 쓰이고,
+          범위를 벗어난 회차면 stageOf 가 던진다. */}
       <span style={{ ...badge, background: stage.chipBgVar, color: stage.chipFgVar }}>
         {stage.emoji} {stage.label}
       </span>

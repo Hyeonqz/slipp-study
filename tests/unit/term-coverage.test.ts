@@ -69,10 +69,20 @@ describe('checkTermCoverage (단위) — 규칙 자체를 검사', () => {
   })
 })
 
-describe('checkTermCoverage (통합) — 실제 content/docs 전체', () => {
-  it('glossary.mdx를 제외한 모든 문서에서, 적격 위치의 용어 첫 등장이 <Term>으로 감싸져 있다', async () => {
+/**
+ * 검사 대상은 **진행자가 쓴 교육 문서**다. 제외 두 곳:
+ *
+ *  - `start/glossary.mdx` — 용어 사전 자신. 정의부를 <Term>으로 감싸면 순환이다
+ *  - `archive/**` — 팀원이 PR로 올리는 산출물. "용어 첫 등장을 감싼다"는 독자를 위한
+ *    편집 규칙이지 제출자가 알아야 할 규칙이 아니다. 여기를 검사 대상에 두면 팀원이
+ *    자기 역기획 글에 '역기획'이라고 쓴 것만으로 저장소 테스트가 빨개지고, 고치는
+ *    법은 문서 어디에도 안 적혀 있다(.claude/skills/archive-submission 참고 —
+ *    제출자에게 요구하는 건 frontmatter 5필드와 익명화뿐이다).
+ */
+describe('checkTermCoverage (통합) — 진행자가 쓴 교육 문서 전체', () => {
+  it('glossary.mdx와 아카이브 제출물을 제외한 모든 문서에서, 적격 위치의 용어 첫 등장이 <Term>으로 감싸져 있다', async () => {
     const files = (await fg('content/docs/**/*.mdx')).filter(
-      (f) => f !== 'content/docs/start/glossary.mdx',
+      (f) => f !== 'content/docs/start/glossary.mdx' && !f.startsWith('content/docs/archive/'),
     )
     expect(files.length).toBeGreaterThan(0)
 
@@ -85,5 +95,29 @@ describe('checkTermCoverage (통합) — 실제 content/docs 전체', () => {
       const detail = allIssues.map((i) => `  ${i.file}: ${i.message}`).join('\n')
       throw new Error(`Step 7b 커버리지 위반 ${allIssues.length}건:\n${detail}`)
     }
+  })
+})
+
+describe('아카이브 제출물은 용어 커버리지 검사 대상이 아니다', () => {
+  it('통합 검사의 필터가 archive/ 를 걸러낸다 — 팀원 PR을 막지 않는다', () => {
+    const files = [
+      'content/docs/weeks/01-kickoff.mdx',
+      'content/docs/archive/w02-example-reverse.mdx',
+      'content/docs/start/glossary.mdx',
+    ]
+    const filtered = files.filter(
+      (f) => f !== 'content/docs/start/glossary.mdx' && !f.startsWith('content/docs/archive/'),
+    )
+    expect(filtered).toEqual(['content/docs/weeks/01-kickoff.mdx'])
+  })
+
+  it('규칙 함수 자체는 여전히 잡는다 — 제외는 "어디에 적용하나"의 문제다', () => {
+    const raw = `---
+title: t
+---
+
+역기획을 해봤습니다.
+`
+    expect(checkTermCoverage('content/docs/archive/x.mdx', raw, ['역기획'])).toHaveLength(1)
   })
 })

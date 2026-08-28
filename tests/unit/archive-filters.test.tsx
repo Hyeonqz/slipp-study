@@ -69,4 +69,9 @@ describe('<ArchiveFilters /> 종류별 필터', () => {
     expect(screen.queryByText(/인터뷰 제출물은 아직 없어요/)).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /역기획 글/ })).toBeInTheDocument()
   })
+
+  it('본문 720px 상한을 벗어나도록 fullbleed 를 단다 — 제출물 그리드가 넓어야 한 화면에 더 들어온다', () => {
+    const { container } = render(<ArchiveFilters submissions={[s()]} />)
+    expect(container.firstElementChild!.className).toContain('fullbleed')
+  })
 })

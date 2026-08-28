@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { source } from '@/lib/source'
-import { curriculum } from '@/content/data/curriculum'
+import { curriculum, weekLabel } from '@/content/data/curriculum'
 import type { Folder, Item } from 'fumadocs-core/page-tree'
 
 /**
@@ -54,7 +54,10 @@ describe('사이드바 구조', () => {
     const items = weeksFolder.children as Item[]
     items.forEach((item) => expect(item.type).toBe('page'))
 
-    expect(items.map((item) => item.name)).toEqual(curriculum.map((w) => w.title))
+    // 사이드바 항목명 = 회차 문서 frontmatter 의 title = weekLabel(w).
+    // 진행자가 curriculum 의 title 만 고치고 mdx frontmatter 를 안 고치면 여기서 갈린다.
+    expect(items.map((item) => item.name)).toEqual(curriculum.map((w) => weekLabel(w)))
+    expect(items[0]!.name).toBe('1회차 — 킥오프')
     expect(items.map((item) => item.url)).toEqual(curriculum.map((w) => `/weeks/${w.slug}`))
   })
 

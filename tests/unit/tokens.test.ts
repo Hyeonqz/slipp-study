@@ -118,8 +118,33 @@ describe('Fumadocs 변수 매핑 (와이어링)', () => {
     expect(css).toMatch(/#nd-sidebar\s*\{\s*border-color:\s*transparent;/)
   })
 
-  it('#nd-page(본문 컨테이너)에 640px 최대 폭을 적용한다', () => {
-    expect(css).toMatch(/#nd-page\s*\{\s*max-width:\s*640px;/)
+  /**
+   * 전체 폭 대시보드 레이아웃 — 세 규칙이 한 세트로 동작한다. 하나만 빠져도
+   * 화면이 조용히 예전으로 돌아가므로(가운데 정렬된 좁은 문서 사이트) 셋 다 건다.
+   */
+  it('#nd-docs-layout 의 --fd-layout-width 를 100% 로 올려 좌우 여백을 없앤다', () => {
+    expect(css).toMatch(/#nd-docs-layout\s*\{[^}]*--fd-layout-width:\s*100%;/)
+  })
+
+  it('--fd-layout-width 에 100vw 를 쓰지 않는다 — 스크롤바 폭만큼 잘린다', () => {
+    expect(css).not.toMatch(/--fd-layout-width:\s*100vw/)
+  })
+
+  it('#nd-page 의 폭 상한과 가운데 정렬을 푼다', () => {
+    expect(css).toMatch(/#nd-page\s*\{\s*max-width:\s*none;\s*margin-inline:\s*0;/)
+  })
+
+  it('산문(.prose 직계 자식)은 720px 로 붙잡는다', () => {
+    expect(css).toMatch(/#nd-page \.prose > \*\s*\{\s*max-width:\s*720px;/)
+  })
+
+  it('.fullbleed 만 그 상한에서 빠져나간다', () => {
+    expect(css).toMatch(/#nd-page \.prose > \.fullbleed\s*\{\s*max-width:\s*none;/)
+  })
+
+  it('표와 코드블록은 자동으로 풀리지 않는다 — 전체 폭은 명시적 opt-in 이다', () => {
+    expect(css).not.toMatch(/#nd-page \.prose > table/)
+    expect(css).not.toMatch(/#nd-page \.prose > figure\.shiki/)
   })
 })
 
