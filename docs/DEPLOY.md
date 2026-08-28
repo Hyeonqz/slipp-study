@@ -1,6 +1,7 @@
 # 배포 · 도메인 연결
 
 사이트 주소: **https://study.calix.kr**
+저장소: **https://github.com/Hyeonqz/slipp-study**
 
 > 이 문서는 저장소 소유자가 직접 수행하는 절차입니다. Vercel 계정과 도메인 관리 콘솔 접근이 필요해서 사람이 해야 합니다.
 
@@ -8,7 +9,7 @@
 
 ## 1. Vercel 프로젝트 연결 (최초 1회)
 
-1. https://vercel.com/new 에서 이 저장소를 **Import**
+1. https://vercel.com/new 에서 `Hyeonqz/slipp-study` 저장소를 **Import**
 2. Framework Preset이 **Next.js**로 자동 인식되는지 확인
 3. Build Command / Output Directory / Install Command 전부 **기본값 그대로** 둡니다
    - `pnpm build`가 `prebuild`를 자동으로 먼저 실행합니다
@@ -67,7 +68,7 @@ Vercel **Settings → Domains**에서 `study.calix.kr` 옆이 **Valid Configurat
 
 ## 4. 팀원에게 저장소 열어주기
 
-GitHub 저장소 → **Settings → Collaborators** → 팀원 계정 추가.
+`Hyeonqz/slipp-study` 저장소 → **Settings → Collaborators** → 팀원 계정 추가.
 
 팀원이 할 일은 저장소 `README.md`의 "산출물 올리는 법"에 있습니다.
 
@@ -84,7 +85,7 @@ GitHub 저장소 → **Settings → Collaborators** → 팀원 계정 추가.
 
 ## 6. 아카이브 PR 흐름 시험
 
-산출물 수집이 실제로 도는지 한 번 돌려보는 절차입니다. (아카이브 기능은 아직 구현 중입니다 — 완성 후 시험하세요.)
+산출물 수집이 실제로 도는지 한 번 돌려보는 절차입니다.
 
 ```bash
 git switch -c test/archive-flow
@@ -115,10 +116,10 @@ git push -u origin test/archive-flow
 
 ## 현재 진행 상황
 
-이 문서를 쓰는 시점에 사이트는 아직 만들어지는 중입니다. 완료된 것과 남은 것:
+사이트는 완성됐습니다. `weeks/` · `notion/01~09` 같은 중복 원본은 정리됐고, `content/docs/`가 유일한 원본입니다.
 
-**완료** — 사이트 골격과 루트 라우팅, 토스 스타일 디자인 토큰, 8회차 커리큘럼 데이터, 회차 문서 8개, 콘텐츠 검증 게이트, README 분할(문서 20개), 용어 사전과 인라인 용어 팝오버, 회차 페이지 UI(배지 · 숙제 카드 · 경고 블록)
+**완료** — 사이트 골격과 루트 라우팅, 토스 스타일 디자인 토큰, 문서 24개(회차 8개, 시작하기 3개, 진행 방식 4개, 양식·예시 6개, 아카이브 2개, 홈), 콘텐츠 검증 게이트, 용어 사전과 인라인 용어 팝오버, 시각화 5종(3단 구조 · 2시간 타임블록 · 8회차 여정 맵 · 왜 이 스터디를 만들었나 · 로드맵), 팀원 산출물 아카이브(자동 집계 + PR 업로드 흐름), 반응형(≥1280 / 1024~1279 / <1024 3단 브레이크포인트) · 접근성(axe) E2E 테스트
 
-**남음** — 3단 구조와 2시간 타임블록 시각화, 8회차 여정 맵, 기획 의도와 방향성 로드맵, 팀원 산출물 아카이브, 반응형·접근성 검증, 마무리 정리
+**남음** — 없음. 이 문서의 1~4절(Vercel 연결, 도메인, 팀원 초대)만 저장소 소유자가 수행하면 됩니다.
 
-지금 배포해도 동작합니다. 남은 작업은 `main`에 push될 때마다 자동으로 반영됩니다.
+지금 배포하면 그대로 완성된 사이트가 뜹니다. 이후 작업은 `main`에 push될 때마다 자동으로 반영됩니다.
