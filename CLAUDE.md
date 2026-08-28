@@ -55,6 +55,17 @@ pnpm test:e2e   # 반응형 · 접근성 (브라우저 필요: pnpm exec playwri
 **모바일 폭 측정은 Playwright 로 하세요.** `chrome --headless=old` 는 meta viewport 에뮬레이션이 없어
 넓게 레이아웃한 뒤 창 너비로 잘라냅니다. 이걸 실제 결함으로 오인해 11개 태스크를 끌고 간 적이 있습니다.
 
+**프로덕션(`study.calix.kr`)을 curl 루프로 폴링하지 마세요.** Vercel 봇 차단이 걸려
+`X-Vercel-Mitigated: challenge` 와 함께 `Vercel Security Checkpoint` 페이지가 돌아옵니다 —
+그 뒤로는 무엇을 grep 해도 "없음"이 나와서 **배포 실패로 오독하게 됩니다.**
+실제로 한 번 그렇게 잘못 보고했습니다(배포는 2분 만에 성공한 상태였습니다).
+배포 여부는 GitHub 배포 기록으로 확인하세요:
+
+```bash
+gh api repos/Hyeonqz/slipp-study/deployments?per_page=3   -q '.[] | "\(.created_at) \(.sha[0:7]) \(.environment)"'
+gh api repos/Hyeonqz/slipp-study/deployments/<id>/statuses -q '.[0].state'
+```
+
 ---
 
 ## 단일 원천 — 여기만 고치면 사이트가 따라옵니다
