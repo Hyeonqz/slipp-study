@@ -26,7 +26,10 @@ import { stageOf } from '@/lib/stage'
  */
 export function JourneyMap() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', margin: '20px 0' }}>
+    // data-testid: tests/e2e/responsive.spec.ts가 이 컨테이너 자체의 폭을
+    // 재는데, 구조적 로케이터(예: 첫 weeks 링크의 부모)는 마크업이 바뀌면
+    // 조용히 다른 요소를 잡을 수 있어 안정적인 앵커로 명시했다(리뷰 Finding 3).
+    <div data-testid="journey-map" style={{ display: 'flex', flexDirection: 'column', margin: '20px 0' }}>
       {curriculum.map((w, i) => {
         const stage = stageOf(w.no)
         const isCurrent = currentWeek === w.no
@@ -53,9 +56,13 @@ export function JourneyMap() {
                     height: 8,
                     borderRadius: 'var(--r-pill)',
                     // Fix Round 1: 텍스트는 없는 순수 채움이라 규칙상 --blue로 둬도
-                    // 대비 기준(3:1)은 통과하지만, 같은 줄의 "03"/"이번 주" 배지가
-                    // 전부 --blue-text라 실측 스크린샷에서 이 점만 더 밝아 보였다
-                    // (task-13-report.md Fix Round 1 참고). 한 클러스터로 통일.
+                    // 대비 기준(3:1)은 통과하지만, 같은 줄의 "03" 텍스트(--blue-text)와
+                    // "이번 주" 배지(--blue-fill)가 라이트에서 둘 다 #1E5FCC라, 이
+                    // 점만 밝은 --blue였다면 실측 스크린샷에서 눈에 띄게 튀었다
+                    // (task-13-report.md Fix Round 1 참고). 한 클러스터로 통일해
+                    // --blue-text를 쓴다(점 자체엔 텍스트가 없으니 --blue-fill이
+                    // 아니라 --blue-text — 다크에서 두 토큰이 갈라진 뒤에도 이
+                    // 점은 "밝은 텍스트 톤"과 맞춰야 옆 숫자와 어긋나 보이지 않는다).
                     background: isCurrent ? 'var(--blue-text)' : stage.barVar,
                     flexShrink: 0,
                   }}
@@ -80,8 +87,10 @@ export function JourneyMap() {
                       fontSize: 10,
                       fontWeight: 700,
                       color: '#fff',
-                      // 흰 글자를 얹는 채움 -> --blue-text(Fix Round 1).
-                      background: 'var(--blue-text)',
+                      // 흰 글자를 얹는 채움 -> --blue-fill(Fix Round 2: 다크에서
+                      // --blue-text와 갈라짐 — 이 배지는 currentWeek가 설정되면
+                      // 바로 렌더되므로 dormant 취급하면 안 된다).
+                      background: 'var(--blue-fill)',
                       borderRadius: 'var(--r-pill)',
                       padding: '1.5px 6px',
                     }}

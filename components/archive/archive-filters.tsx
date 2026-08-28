@@ -12,8 +12,10 @@ const chip = (on: boolean): React.CSSProperties => ({
   borderRadius: 'var(--r-pill)',
   border: 'none',
   cursor: 'pointer',
-  // 흰 글자를 얹는 채움이라 텍스트 대비 규정을 받는다 -> --blue-text(Fix Round 1).
-  background: on ? 'var(--blue-text)' : 'var(--g100)',
+  // 흰 글자를 얹는 채움 -> --blue-fill(Fix Round 2: 다크에서 --blue-text와
+  // 갈라짐 — 흰 텍스트 대비를 만족하는 값이 텍스트-온-다크-배경 대비를
+  // 만족하는 값과 반대 방향이라 --blue-text로는 다크에서 3.07:1까지 떨어졌다).
+  background: on ? 'var(--blue-fill)' : 'var(--g100)',
   color: on ? '#fff' : 'var(--g700)',
 })
 
