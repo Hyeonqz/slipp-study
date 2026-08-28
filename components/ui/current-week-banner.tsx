@@ -26,7 +26,7 @@ export function CurrentWeekBanner() {
         textDecoration: 'none',
       }}
     >
-      <div style={{ fontSize: 11.5, fontWeight: 800, color: 'var(--blue)' }}>이번 주</div>
+      <div style={{ fontSize: 11.5, fontWeight: 800, color: 'var(--blue-text)' }}>이번 주</div>
       <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--g900)', marginTop: 3 }}>
         {currentWeek}회차 · {w.title}
       </div>

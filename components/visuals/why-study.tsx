@@ -79,7 +79,7 @@ export function WhyStudy() {
             {c.links && (
               <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 5 }}>
                 {c.links.map((l) => (
-                  <Link key={l.href} href={l.href} style={{ fontSize: 13, color: 'var(--blue)' }}>
+                  <Link key={l.href} href={l.href} style={{ fontSize: 13, color: 'var(--blue-text)' }}>
                     {l.text} →
                   </Link>
                 ))}

@@ -12,7 +12,8 @@ const chip = (on: boolean): React.CSSProperties => ({
   borderRadius: 'var(--r-pill)',
   border: 'none',
   cursor: 'pointer',
-  background: on ? 'var(--blue)' : 'var(--g100)',
+  // 흰 글자를 얹는 채움이라 텍스트 대비 규정을 받는다 -> --blue-text(Fix Round 1).
+  background: on ? 'var(--blue-text)' : 'var(--g100)',
   color: on ? '#fff' : 'var(--g700)',
 })
 

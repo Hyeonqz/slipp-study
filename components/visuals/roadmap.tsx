@@ -23,7 +23,11 @@ export function Roadmap() {
                 height: 11,
                 borderRadius: '50%',
                 marginTop: 6,
-                background: m.current ? 'var(--blue)' : 'var(--g300)',
+                // Fix Round 1: 점 자체는 텍스트 없는 채움이라 규칙상 --blue로 둬도
+                // 대비 기준(3:1)은 통과하지만, 바로 옆(14px 간격) 날짜 라벨이
+                // --blue-text라 실측 스크린샷에서 점만 더 밝게 튀어 보였다
+                // (task-13-report.md Fix Round 1 참고). 점+라벨을 한 단위로 묶는다.
+                background: m.current ? 'var(--blue-text)' : 'var(--g300)',
                 boxShadow: m.current ? '0 0 0 4px var(--blue-bg)' : undefined,
               }}
             />
@@ -36,7 +40,7 @@ export function Roadmap() {
               style={{
                 fontSize: 13,
                 fontWeight: m.current ? 800 : 700,
-                color: m.current ? 'var(--blue)' : 'var(--g600)',
+                color: m.current ? 'var(--blue-text)' : 'var(--g600)',
               }}
             >
               {m.when}

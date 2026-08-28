@@ -52,7 +52,11 @@ export function JourneyMap() {
                     width: 8,
                     height: 8,
                     borderRadius: 'var(--r-pill)',
-                    background: isCurrent ? 'var(--blue)' : stage.barVar,
+                    // Fix Round 1: 텍스트는 없는 순수 채움이라 규칙상 --blue로 둬도
+                    // 대비 기준(3:1)은 통과하지만, 같은 줄의 "03"/"이번 주" 배지가
+                    // 전부 --blue-text라 실측 스크린샷에서 이 점만 더 밝아 보였다
+                    // (task-13-report.md Fix Round 1 참고). 한 클러스터로 통일.
+                    background: isCurrent ? 'var(--blue-text)' : stage.barVar,
                     flexShrink: 0,
                   }}
                 />
@@ -61,7 +65,7 @@ export function JourneyMap() {
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
-                    color: isCurrent ? 'var(--blue)' : 'var(--g600)',
+                    color: isCurrent ? 'var(--blue-text)' : 'var(--g600)',
                   }}
                 >
                   {String(w.no).padStart(2, '0')}
@@ -76,7 +80,8 @@ export function JourneyMap() {
                       fontSize: 10,
                       fontWeight: 700,
                       color: '#fff',
-                      background: 'var(--blue)',
+                      // 흰 글자를 얹는 채움 -> --blue-text(Fix Round 1).
+                      background: 'var(--blue-text)',
                       borderRadius: 'var(--r-pill)',
                       padding: '1.5px 6px',
                     }}

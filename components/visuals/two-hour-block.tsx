@@ -56,7 +56,7 @@ export function TwoHourBlock() {
               style={{
                 fontSize: 12,
                 fontWeight: 700,
-                color: b.hero ? 'var(--blue)' : 'var(--g600)',
+                color: b.hero ? 'var(--blue-text)' : 'var(--g600)',
                 width: 42,
                 flexShrink: 0,
               }}
@@ -68,6 +68,11 @@ export function TwoHourBlock() {
               style={{
                 height: 8,
                 borderRadius: 'var(--r-pill)',
+                // Fix Round 1 판단: 이 바도 옆(12px 간격)에 --blue-text 분 라벨이
+                // 있지만, 실측 스크린샷으로 비교한 결과 점 배지(journey-map/roadmap)와
+                // 달리 폭이 넓은 진행률 바라서 "같은 배지가 어긋난" 것보다 "분량을
+                // 나타내는 별개의 시각 요소"로 읽혔다 — Toss blue 유지
+                // (task-13-report.md Fix Round 1 판단 근거 참고).
                 background: b.hero ? 'var(--blue)' : 'var(--g300)',
                 width: `${(b.minutes / TOTAL) * 100}%`,
                 flexShrink: 0,

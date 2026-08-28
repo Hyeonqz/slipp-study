@@ -20,7 +20,7 @@ export function Homework({ week }: { week: number }) {
         margin: '20px 0',
       }}
     >
-      <div style={{ fontSize: 11.5, fontWeight: 800, color: 'var(--blue)' }}>
+      <div style={{ fontSize: 11.5, fontWeight: 800, color: 'var(--blue-text)' }}>
         {isLast ? '숙제' : `${week + 1}주차 숙제`}
       </div>
       <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--g900)', marginTop: 5 }}>

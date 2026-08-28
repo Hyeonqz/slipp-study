@@ -4,14 +4,22 @@ import { readFileSync } from 'node:fs'
 const css = readFileSync('app/global.css', 'utf-8')
 
 describe('디자인 토큰', () => {
-  // --g600, --blue 값은 Task 13에서 axe-core 실측 대비 위반(AA 4.5:1 미달) 때문에
-  // 조정됐다: --g600 #6B7684→#5A6874(카드/서브내비 반투명 배경 위 4.3~4.4:1 미달 해결),
-  // --blue #3182F6→#1E5FCC(사이드바 "지금 여기" 라벨의 3.71:1, 활성 블루 배경 위 4.28:1
-  // 미달 해결). 자세한 계산은 app/global.css 해당 토큰 주석 참고.
+  // --g600 값은 Task 13에서 axe-core 실측 대비 위반(AA 4.5:1 미달) 때문에 조정됐다:
+  // #6B7684→#5A6874(카드/서브내비 반투명 배경 위 4.3~4.4:1 미달 해결).
+  //
+  // --blue 는 Task 13 Fix Round 1에서 텍스트/비텍스트 용도로 분리됐다. 원래 --blue
+  // 하나(#3182F6)를 텍스트에도 썼더니 흰 배경 3.71:1로 AA(4.5:1) 미달이었는데, 값
+  // 자체를 어둡게 낮추면 텍스트 없는 순수 그래픽(포커스 링·바·점 — WCAG 비텍스트
+  // 기준 3:1은 원래도 통과)까지 다 어두워져 브랜드 톤이 불필요하게 바뀐다. 그래서:
+  //   --blue      원래 토스 블루(#3182F6) 그대로 — 텍스트 없는 그래픽 전용.
+  //   --blue-text #1E5FCC — 텍스트, 그리고 흰 텍스트를 얹는 블루 채움 전용.
+  // 두 토큰이 같은 시각 단위에서 붙어 나타나는 자리(여정맵 현재 회차 점, 로드맵
+  // 현재 마커 점)는 실측 스크린샷 비교 후 --blue-text로 통일했다 — 자세한 계산과
+  // 판단 근거는 app/global.css 토큰 주석과 task-13-report.md Fix Round 1 참고.
   const required = [
     '--g50: #F9FAFB', '--g100: #F2F4F6', '--g200: #E5E8EB', '--g300: #D1D6DB',
     '--g500: #8B95A1', '--g600: #5A6874', '--g700: #4E5968', '--g800: #333D4B',
-    '--g900: #191F28', '--blue: #1E5FCC', '--blue-bg: #E8F3FF',
+    '--g900: #191F28', '--blue: #3182F6', '--blue-text: #1E5FCC', '--blue-bg: #E8F3FF',
     '--red: #F04452', '--green: #15C26B',
     '--stage-eye-bar: #C6D8F5', '--stage-hand-bar: #C2E6D2', '--stage-head-bar: #F5D9C2',
   ]
@@ -38,7 +46,7 @@ describe('Fumadocs 변수 매핑 (와이어링)', () => {
     '--color-fd-card: var(--g50)',
     '--color-fd-card-foreground: var(--g900)',
     '--color-fd-border: var(--g200)',
-    '--color-fd-primary: var(--blue)',
+    '--color-fd-primary: var(--blue-text)',
     '--color-fd-primary-foreground: #FFFFFF',
     '--color-fd-accent: var(--g100)',
     '--color-fd-accent-foreground: var(--g900)',
