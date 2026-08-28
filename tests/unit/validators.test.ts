@@ -6,6 +6,7 @@ import {
   checkInternalLinks,
   docPathToUrl,
   normalizeDateValue,
+  parseFrontmatter,
 } from '@/lib/validators'
 import { ARCHIVE_TYPES } from '@/content/data/archive-types'
 
@@ -173,6 +174,36 @@ describe('checkInternalLinks', () => {
     expect(
       checkInternalLinks('a.mdx', '![로고](/images/logo.png)', urls),
     ).toEqual([])
+  })
+})
+
+/**
+ * Fix Wave finding 4: 콜론이 든 값(`title: 당근마켓: 왜 채팅만 있나`)처럼 흔한
+ * YAML 실수가 파일명 없는 raw unhandled rejection(Node 스택 트레이스)으로
+ * 튀어나오던 문제. `matter()`의 예외를 다른 검증 실패와 같은 모양의 `Issue`로
+ * 바꿔, 어떤 파일이 문제인지 항상 드러나게 한다.
+ */
+describe('parseFrontmatter', () => {
+  it('정상 frontmatter는 data/content로 파싱한다', () => {
+    const raw = '---\ntitle: 정상 제목\nweek: 2\n---\n본문입니다'
+    const result = parseFrontmatter('a.mdx', raw)
+    expect('issue' in result).toBe(false)
+    if (!('issue' in result)) {
+      expect(result.data.title).toBe('정상 제목')
+      expect(result.content.trim()).toBe('본문입니다')
+    }
+  })
+
+  it('값에 따옴표 없는 콜론이 있으면(가장 흔한 실수) 파일명을 담은 Issue를 반환한다 (예외를 던지지 않는다)', () => {
+    const raw = '---\ntitle: 당근마켓: 왜 채팅만 있나\nweek: 2\n---\n본문'
+    const result = parseFrontmatter('content/docs/archive/w02-hong-prd.mdx', raw)
+    expect('issue' in result).toBe(true)
+    if ('issue' in result) {
+      expect(result.issue.file).toBe('content/docs/archive/w02-hong-prd.mdx')
+      expect(result.issue.message).toMatch(/frontmatter\(YAML\)를 해석할 수 없습니다/)
+      expect(result.issue.message).toMatch(/콜론/)
+      expect(result.issue.message).toMatch(/따옴표/)
+    }
   })
 })
 

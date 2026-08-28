@@ -1,4 +1,5 @@
 import { posix } from 'node:path'
+import matter from 'gray-matter'
 import { ARCHIVE_TYPES } from '@/content/data/archive-types'
 
 /**
@@ -12,6 +13,33 @@ const KNOWN_ARCHIVE_TYPES: readonly string[] = ARCHIVE_TYPES
 export interface Issue {
   file: string
   message: string
+}
+
+/**
+ * `matter()`(gray-matter, 내부적으로 js-yaml)는 frontmatter YAML이 잘못됐으면
+ * `YAMLException`을 던진다. 예전에는 `scripts/validate-content.ts`가 이걸
+ * 그대로 두어, 참가자가 이 워크플로에서 가장 흔히 저지르는 실수(값에 콜론이
+ * 들어간 `title: 당근마켓: 왜 채팅만 있나`)가 파일명도 없는 raw unhandled
+ * rejection + Node 스택 트레이스로 튀어나왔다(Fix Wave finding 4). 이 함수가
+ * 그 예외를 다른 검증 실패와 똑같은 모양의 `Issue`로 바꿔, 어떤 파일이
+ * 문제인지 항상 알 수 있게 한다.
+ */
+export function parseFrontmatter(
+  file: string,
+  raw: string,
+): { data: Record<string, unknown>; content: string } | { issue: Issue } {
+  try {
+    const { data, content } = matter(raw)
+    return { data, content }
+  } catch (e) {
+    const reason = e instanceof Error ? e.message : String(e)
+    return {
+      issue: {
+        file,
+        message: `frontmatter(YAML)를 해석할 수 없습니다. 값에 콜론(:)이 있으면 따옴표로 감싸주세요 — 예: title: "당근마켓: 왜 채팅만 있나". (원본 오류: ${reason})`,
+      },
+    }
+  }
 }
 
 export function checkCurriculumSlugs(fileSlugs: string[], curriculumSlugs: string[]): Issue[] {

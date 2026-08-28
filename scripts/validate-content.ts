@@ -1,5 +1,4 @@
 import fg from 'fast-glob'
-import matter from 'gray-matter'
 import { readFileSync } from 'node:fs'
 import { basename } from 'node:path'
 import { curriculum } from '../content/data/curriculum'
@@ -10,6 +9,7 @@ import {
   checkTerms,
   checkInternalLinks,
   docPathToUrl,
+  parseFrontmatter,
   type Issue,
 } from '../lib/validators'
 
@@ -25,7 +25,12 @@ async function main() {
   issues.push(...checkCurriculumSlugs(weekSlugs, curriculum.map((w) => w.slug)))
 
   for (const file of files) {
-    const { data, content } = matter(readFileSync(file, 'utf-8'))
+    const parsed = parseFrontmatter(file, readFileSync(file, 'utf-8'))
+    if ('issue' in parsed) {
+      issues.push(parsed.issue)
+      continue
+    }
+    const { data, content } = parsed
 
     if (file.startsWith('content/docs/archive/') && basename(file) !== 'index.mdx') {
       issues.push(...checkArchiveFrontmatter(file, data))
@@ -43,4 +48,8 @@ async function main() {
   console.log(`콘텐츠 검증 통과 — 문서 ${files.length}개`)
 }
 
-main()
+main().catch((err) => {
+  console.error('콘텐츠 검증 스크립트가 예기치 못한 오류로 중단됐습니다.')
+  console.error(err)
+  process.exit(1)
+})
