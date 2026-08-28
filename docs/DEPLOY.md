@@ -29,26 +29,41 @@
 
 > ⚠️ **화면에 표시된 값을 그대로 쓰세요.** Vercel이 값을 바꾸는 경우가 있으므로, 이 문서에 적힌 예시가 아니라 **대시보드 값이 기준**입니다.
 
-### 2-2. 메가존클라우드 DNS에 CNAME 추가
+### 2-2. Cloudflare DNS에 CNAME 추가
 
-도메인 관리 콘솔에서 `calix.kr`의 DNS 레코드에 추가합니다.
+`calix.kr` 의 네임서버는 Cloudflare(`chan/ajay.ns.cloudflare.com`)입니다.
+
+Cloudflare 대시보드 → `calix.kr` → **DNS → Records → Add record**
 
 | 항목 | 값 |
 |---|---|
-| 타입 | `CNAME` |
-| 호스트 / 이름 | `study` (콘솔에 따라 `study.calix.kr` 전체를 넣어야 할 수도 있습니다) |
-| 값 / 대상 | Vercel이 알려준 값 (예: `cname.vercel-dns.com`) |
-| TTL | 기본값 (300~3600) |
+| Type | `CNAME` |
+| Name | `study` — 전체 주소가 아니라 `study` 만 (Cloudflare가 `.calix.kr` 을 자동으로 붙입니다) |
+| Target | Vercel이 알려준 값 (예: `cname.vercel-dns.com`) |
+| **Proxy status** | **DNS only — 회색 구름** |
+| TTL | Auto |
+
+> ⚠️ **주황 구름(프록시)을 반드시 끄세요.**
+>
+> Cloudflare는 CNAME 추가 시 프록시를 기본으로 켭니다. 켜져 있으면 Vercel이
+> 도메인 소유 확인과 인증서 발급을 못 해서 **Invalid Configuration 에 머뭅니다.**
+> 또 Cloudflare CDN 과 Vercel CDN 이 이중으로 겹칩니다.
+>
+> 저장 후 목록에서 구름 아이콘이 **회색**인지 다시 확인하세요.
+>
+> 프록시를 꼭 켜야 한다면 **SSL/TLS → Overview 를 `Full (strict)`** 로 먼저 바꾸세요.
+> 기본값 `Flexible` 에서 켜면 **무한 리다이렉트 루프**에 빠집니다.
 
 > **왜 apex(`calix.kr`)가 아니라 서브도메인인가**
 >
 > DNS 표준상 apex 도메인에는 CNAME과 다른 레코드(NS, SOA 등)가 공존할 수 없습니다.
 > apex에 붙이려면 A 레코드(`76.76.21.21`)를 써야 합니다.
-> `study.calix.kr`은 서브도메인이라 CNAME이 정석이고, Vercel이 IP를 바꿔도 따라갑니다.
+> `study.calix.kr` 은 서브도메인이라 CNAME이 정석이고, Vercel이 IP를 바꿔도 따라갑니다.
+> (Cloudflare는 apex에서 CNAME flattening 을 지원하지만, 서브도메인을 쓰므로 해당 없습니다.)
 
 ### 2-3. 확인
 
-DNS 전파에 보통 몇 분, 최대 몇 시간 걸립니다.
+Cloudflare는 전파가 보통 1분 안쪽입니다.
 
 ```bash
 nslookup study.calix.kr
