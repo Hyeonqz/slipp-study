@@ -2,6 +2,10 @@
   "name": "study-dashboard",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.24.0",
+  "engines": {
+    "node": "22.x"
+  },
   "type": "module",
   "scripts": {
     "dev": "next dev",

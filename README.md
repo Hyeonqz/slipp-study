@@ -29,13 +29,30 @@
 
 ## 로컬에서 실행하기
 
+**새 PC에서 처음 한 번:**
+
 ```bash
+node -v                          # 22.x 여야 합니다 (.nvmrc 참고, nvm 쓰면 `nvm use`)
+corepack enable                  # package.json 의 packageManager 대로 pnpm 버전을 맞춥니다
 pnpm install
+pnpm exec playwright install     # E2E 브라우저 — PC마다 따로 받아야 합니다
+```
+
+**평소:**
+
+```bash
+pnpm install    # git pull 후 lockfile 이 바뀌었을 때
 pnpm dev        # http://localhost:3000
 pnpm build      # 타입 검사 + 콘텐츠 검증 + 빌드
 pnpm test       # 단위 테스트
 pnpm test:e2e   # 반응형 · 접근성 테스트
 ```
+
+> **여러 PC에서 작업할 때**
+>
+> Node 와 pnpm 버전은 `.nvmrc` 와 `package.json` 의 `packageManager` 로 고정돼 있습니다.
+> 버전이 다르면 `pnpm install` 이 `pnpm-lock.yaml` 을 다시 써서 두 PC가 서로 덮어씁니다.
+> 줄바꿈은 `.gitattributes` 가 LF 로 고정하므로 Windows·macOS 를 섞어 써도 됩니다.
 
 ## 산출물 올리는 법
 
