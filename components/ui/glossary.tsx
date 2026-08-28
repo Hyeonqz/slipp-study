@@ -31,7 +31,6 @@ export function Glossary() {
           padding: '12px 16px',
           fontSize: 15,
           color: 'var(--g900)',
-          outlineColor: 'var(--blue)',
         }}
       />
 

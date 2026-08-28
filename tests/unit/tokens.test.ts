@@ -122,3 +122,16 @@ describe('Fumadocs 변수 매핑 (와이어링)', () => {
     expect(css).toMatch(/#nd-page\s*\{\s*max-width:\s*640px;/)
   })
 })
+
+/**
+ * Fix Wave finding 7: `outline-color`만 주고 `outline-style`/`outline-width`가
+ * 없으면 Chrome의 `outline: auto` 기본값이 색을 무시하고 브라우저 기본 링을
+ * 그린다 — 스펙 §6.7 "--blue 2px 아웃라인"이 실제로는 적용되지 않고 있었다.
+ * 전역 `:focus-visible` 규칙이 style/width/color를 한 번에 셋(shorthand)으로
+ * 지정하는지 직접 검증한다.
+ */
+describe('포커스 링 (Fix Wave finding 7)', () => {
+  it(':focus-visible이 --blue 2px 아웃라인을 shorthand로 지정한다 (색만 있고 너비/스타일이 없는 회귀 방지)', () => {
+    expect(css).toMatch(/:focus-visible\s*\{[^}]*outline:\s*2px\s+solid\s+var\(--blue\)/)
+  })
+})

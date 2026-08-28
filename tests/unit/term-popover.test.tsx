@@ -125,4 +125,35 @@ describe('<Term /> 팝오버 상호작용', () => {
     const hidden = document.querySelector('[aria-hidden="true"]') as HTMLElement
     expect(hidden.style.color).toBe('var(--g700)')
   })
+
+  /**
+   * Fix Wave finding 5: 같은 트리거를 두 번째로 탭(=클릭)하면 닫혀야 한다.
+   * 모바일에는 Escape가 없고, 트리거를 다시 탭하는 것 말고는 "바깥을 탭"할
+   * 손가락이 이미 트리거 위에 있는 셈이라 자연스러운 닫기 동작이다.
+   */
+  it('Finding 5 — 같은 트리거를 두 번 연속 탭하면 두 번째 탭에 닫힌다', async () => {
+    const user = userEvent.setup()
+    render(<Term>PRD</Term>)
+    const trigger = screen.getByText('PRD')
+    const panel = document.querySelector('[aria-hidden="true"]') as HTMLElement
+
+    expect(panel.className).toContain('opacity-0')
+    await user.click(trigger)
+    expect(panel.className).toContain('opacity-100')
+    await user.click(trigger)
+    expect(panel.className).toContain('opacity-0')
+  })
+
+  it('Finding 5 — 세 번째 탭에 다시 열린다 (토글이 매번 반대로 뒤집힌다)', async () => {
+    const user = userEvent.setup()
+    render(<Term>PRD</Term>)
+    const trigger = screen.getByText('PRD')
+    const panel = document.querySelector('[aria-hidden="true"]') as HTMLElement
+
+    await user.click(trigger)
+    await user.click(trigger)
+    expect(panel.className).toContain('opacity-0')
+    await user.click(trigger)
+    expect(panel.className).toContain('opacity-100')
+  })
 })

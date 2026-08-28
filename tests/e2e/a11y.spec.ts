@@ -65,9 +65,18 @@ test('키보드로 사이드바에서 본문으로 이동할 수 있다', async 
   await page.keyboard.press('Tab')
   const focused = await page.evaluate(() => document.activeElement?.tagName)
   expect(focused).toBeTruthy()
+
+  // 리뷰(Fix Wave finding 7): `outlineStyle !== 'none'`만 보면 브라우저 기본
+  // 포커스 링(대개 `auto`/검정)도 통과해버려서, 스펙 §6.7의 "--blue 2px
+  // 아웃라인"이 실제로 적용됐는지는 이 단언으로 전혀 검증되지 않았다.
+  // outline-width와 outline-color 실측값까지 확인해야 --blue가 실제로
+  // 렌더링됐다는 증거가 된다. --blue는 #3182F6 = rgb(49, 130, 246).
   const outline = await page.evaluate(() => {
     const el = document.activeElement as HTMLElement
-    return getComputedStyle(el).outlineStyle
+    const style = getComputedStyle(el)
+    return { style: style.outlineStyle, width: style.outlineWidth, color: style.outlineColor }
   })
-  expect(outline).not.toBe('none')
+  expect(outline.style).toBe('solid')
+  expect(outline.width).toBe('2px')
+  expect(outline.color).toBe('rgb(49, 130, 246)')
 })

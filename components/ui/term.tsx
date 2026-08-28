@@ -39,6 +39,40 @@ export function Term({ children }: { children: string }) {
 
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLSpanElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  /**
+   * Fix Wave finding 5: 두 번째 탭이 안 닫혔다 — `onClick={() => setOpen(true)}`
+   * 라서 이미 열린 상태에서 다시 탭해도 계속 열림으로 고정됐다. 터치 기기에서
+   * 벗어난 곳을 탭하거나 Escape(모바일엔 없음) 말고는 닫을 방법이 없었다.
+   *
+   * 단순히 `setOpen(o => !o)`로는 못 고친다 — 클릭(=탭) 한 번은 브라우저에서
+   * `pointerdown → focus → click` 순서로 이벤트를 낸다. 이 컴포넌트는 키보드
+   * 포커스로도 열려야 해서(`onFocus`) `click`이 실행되는 시점엔 `open`이 이미
+   * `true`로 바뀌어 있다 — `open` 자체를 뒤집으면 "닫혀있다가 첫 탭에 여는" 그
+   * 첫 탭에서마저 곧바로 닫혀버린다. 데스크톱에서는 `click` 직전에 항상
+   * `mouseenter`(호버)가 먼저 실행되는 것도 문제다 — 마우스로 뭔가를 클릭하려면
+   * 커서가 먼저 그 위에 올라가야 하므로, `open`의 실시간 값은 클릭 직전 호버가
+   * 강제로 `true`로 되돌려놓은 값일 수 있다. 그래서 `open`(호버·포커스·클릭이
+   * 전부 건드리는 "화면에 보이는" 상태)을 토글 판단 기준으로 그대로 쓸 수 없다.
+   *
+   * 그래서 클릭 스스로의 "의도"만 별도 ref(`clickIntentRef`)에 담아 토글
+   * 기준으로 쓴다 — 호버 핸들러는 이 ref를 절대 건드리지 않으므로 호버가 아무리
+   * 끼어들어도 토글 판단이 오염되지 않는다.
+   *  - 트리거가 이번 제스처 시작 전에 아직 포커스를 받지 않았다(`pointerdown`
+   *    시점의 `document.activeElement`로 판별) → 처음 여는 탭이다. `open`을
+   *    켜고 `clickIntentRef`도 `true`로 맞춘다(토글하지 않는다 — 첫 탭은
+   *    항상 연다).
+   *  - 이미 포커스를 받은 상태였다(두 번째 이후 탭 — 이미 포커스된 요소는
+   *    `focus`가 재발화하지 않는다) → `clickIntentRef`를 뒤집는다. 화면에 보이는
+   *    `open`이 호버로 오염돼 있어도 `clickIntentRef`는 오직 클릭만 바꾼
+   *    값이라 세 번째, 네 번째 탭에서도 정확히 토글된다.
+   * 바깥을 탭했을 때(document 리스너)와 Escape로 닫을 때도 `clickIntentRef`를
+   * `false`로 맞춰, 다음 탭이 "이미 열려있던 것으로 착각해 다시 닫는" 일이
+   * 없게 한다.
+   */
+  const wasFocusedRef = useRef(false)
+  const clickIntentRef = useRef(false)
 
   /**
    * Fix Round 2 / Finding 4: 예시(entry.example)는 지금까지 팝오버 안에만
@@ -67,6 +101,7 @@ export function Term({ children }: { children: string }) {
     function onOutside(e: MouseEvent) {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
         setOpen(false)
+        clickIntentRef.current = false
       }
     }
     document.addEventListener('click', onOutside)
@@ -76,6 +111,7 @@ export function Term({ children }: { children: string }) {
   function onKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
     if (e.key === 'Escape') {
       setOpen(false)
+      clickIntentRef.current = false
       e.currentTarget.blur()
     }
   }
@@ -83,6 +119,7 @@ export function Term({ children }: { children: string }) {
   return (
     <span ref={rootRef} className="relative inline-block">
       <button
+        ref={triggerRef}
         type="button"
         aria-label={accessibleLabel}
         aria-expanded={open}
@@ -90,12 +127,18 @@ export function Term({ children }: { children: string }) {
         onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
-        onClick={() => setOpen(true)}
+        onPointerDown={() => {
+          wasFocusedRef.current = document.activeElement === triggerRef.current
+        }}
+        onClick={() => {
+          const next = wasFocusedRef.current ? !clickIntentRef.current : true
+          clickIntentRef.current = next
+          setOpen(next)
+        }}
         onKeyDown={onKeyDown}
-        className="m-0 inline border-0 bg-transparent p-0 align-baseline cursor-help outline-offset-2"
+        className="m-0 inline border-0 bg-transparent p-0 align-baseline cursor-help"
         style={{
           borderBottom: '1.5px dotted var(--g500)',
-          outlineColor: 'var(--blue)',
           font: 'inherit',
           color: 'inherit',
         }}
