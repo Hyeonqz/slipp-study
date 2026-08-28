@@ -60,7 +60,9 @@ export function ArchiveFilters({ submissions }: { submissions: Submission[] }) {
   )
 
   return (
-    <div>
+    // 전체 폭: 제출물이 쌓이면 회차별 그리드가 좌우로 넓어야 한 화면에 더 들어온다
+    // (app/global.css 의 .fullbleed 참고 — 본문 720px 상한에서 빠져나온다).
+    <div className="fullbleed">
       <div style={{ display: 'flex', gap: 6 }}>
         <button style={chip(!byAuthor)} onClick={() => setByAuthor(false)}>회차별</button>
         <button style={chip(byAuthor)} onClick={() => setByAuthor(true)}>작성자별</button>

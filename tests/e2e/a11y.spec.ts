@@ -2,9 +2,12 @@ import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
 // 브리프 기본 5개 + 결함 보고에 등장한 페이지(/start/why, /archive/w02-example-reverse) 보강
+// + /start/roadmap — <StudyArc />(단계 칩 3종 + 결승선 파랑 카드)와 <Roadmap />의
+//   새 색 조합이 여기에만 있다. 이 페이지가 빠져 있으면 그 조합은 한 번도 스캔되지 않는다.
 const PAGES = [
   '/',
   '/start/why',
+  '/start/roadmap',
   '/start/glossary',
   '/how/two-hours',
   '/weeks/04-prd',

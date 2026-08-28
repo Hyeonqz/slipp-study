@@ -59,12 +59,12 @@ export const curriculum: Week[] = [
   {
     no: 7, stage: 'head', slug: '07-my-idea', title: '내 아이디어',
     headline: '내 아이디어 — 전원 공격',
-    deliverable: '검증 실행 결과 + 계속할까 접을까 결론',
+    deliverable: '검증 결과 + AI로만 만든 제안 PPT',
     preread: ['YC "How to talk to users"', '벤 호로위츠 강연'],
   },
   {
-    no: 8, stage: 'head', slug: '08-validation-retro', title: '검증 결과 + 회고',
-    headline: '검증 결과 발표 + 8주 전체 회고',
+    no: 8, stage: 'head', slug: '08-validation-retro', title: 'AI 사업 제안 + 회고',
+    headline: 'AI만 써서 만든 PPT로 사업 제안 + 8주 전체 회고',
     deliverable: '없음 — 뒤풀이',
   },
 ]
@@ -81,4 +81,19 @@ export const currentWeek: number | null = null
 
 export function weekBySlug(slug: string): Week | undefined {
   return curriculum.find((w) => w.slug === slug)
+}
+
+/**
+ * 사이드바·문서 제목에 쓰는 회차 라벨. 예: `1회차 — 킥오프`
+ *
+ * `title`은 짧은 이름 그대로 둔다 — 여정 맵 카드나 배지처럼 회차 번호를 이미
+ * 따로 보여주는 자리에서 "1회차 1회차 — 킥오프"가 되는 걸 막기 위해서다.
+ * 번호가 붙은 형태가 필요한 곳(회차 문서 frontmatter의 title → 사이드바 항목명
+ * 이자 페이지 H1)에서만 이 함수를 거친다.
+ *
+ * `tests/unit/sidebar.test.ts`가 실제 페이지 트리의 항목명이 이 값과 같은지
+ * 검사하므로, frontmatter를 고치면서 여기를 안 고치면 테스트가 잡는다.
+ */
+export function weekLabel(w: Week): string {
+  return `${w.no}회차 — ${w.title}`
 }

@@ -1,7 +1,11 @@
 export interface Milestone {
   when: string
   what: string
+  /** 한 줄 부연 — 무엇을 보고 "이 지점을 지났다"고 판단하는지 */
+  detail?: string
   current?: boolean
+  /** 8주 스터디의 결승선. 화면에서 깃발로 강조된다 */
+  finish?: boolean
   /** true면 화면에 "작성 예정"으로 표시된다 */
   draft?: boolean
 }
@@ -10,14 +14,48 @@ export interface Milestone {
  * 나의 방향성 로드맵.
  *
  * ── 채우는 법 ──
- * 첫 항목(지금)만 채워져 있다. 나머지 draft 항목의 what을 쓰고 draft를 지운다.
+ * `what`은 그 시점에 하는 일, `detail`은 "지났다"를 판단하는 기준을 쓴다.
  * when은 자유롭게 바꿔도 된다 (예: "2027 상반기"). 항목 수도 늘리거나 줄여도 된다.
- * 단, current: true 는 정확히 하나만 있어야 한다.
+ * 아직 못 정한 항목은 `what`을 비우고 `draft: true`를 두면 "작성 예정"으로 뜬다.
+ *
+ * ── 지켜야 할 것 ──
+ * - `current: true`는 정확히 하나
+ * - `finish: true`도 정확히 하나 (8주 스터디의 도착점)
+ * 둘 다 tests/unit/roadmap.test.tsx가 검사한다.
  */
 export const roadmap: Milestone[] = [
-  { when: '지금 — 8주 스터디', what: '기획 감각 만들기', current: true },
-  { when: '+3개월', what: '', draft: true },
-  { when: '+6개월', what: '', draft: true },
-  { when: '+1년', what: '', draft: true },
-  { when: '그 다음', what: '', draft: true },
+  {
+    when: '지금 — 8주 스터디',
+    what: '기획을 "배우는" 게 아니라 판단을 내려보기',
+    detail: '남의 결정을 읽고(1~3회차), 내 문서를 쓰고(4~6회차), 내 판단을 시장에 던진다(7~8회차)',
+    current: true,
+  },
+  {
+    when: '8회차 — 결승선',
+    what: 'AI만 써서 만든 제안으로 사람들 앞에 선다',
+    detail:
+      '리서치·구조·슬라이드·스크립트까지 전부 AI로. 손으로 만든 장표는 한 장도 없이, 진짜 기획자처럼 사업을 제안해본다',
+    finish: true,
+  },
+  {
+    when: '+3개월',
+    what: '제안했던 것 중 하나를 실제로 붙여본다',
+    detail: '발표로 끝내지 않는다. 사람 10명이 실제로 써보는 상태까지 가져간다',
+  },
+  {
+    when: '+6개월',
+    what: '돈이 도는지 확인한다',
+    detail: '"좋아요"가 아니라 결제. 한 명이라도 돈을 내면 가설이 산 것이고, 아무도 안 내면 죽은 것이다',
+  },
+  {
+    when: '+1년',
+    what: '부업으로 둘지, 사업으로 넘길지 판단한다',
+    detail: '기분이 아니라 6개월치 숫자를 근거로. 접는 것도 이 판단에 포함된다',
+  },
+  {
+    when: '그 다음',
+    what: '혼자서 사이클을 돌릴 수 있는 상태',
+    detail:
+      '기획 → 검증 → 출시 → 회수를 남의 도움 없이 한 바퀴. 이게 되면 아이템이 바뀌어도 다시 시작할 수 있다',
+  },
 ]

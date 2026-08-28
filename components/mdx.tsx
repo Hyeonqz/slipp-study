@@ -12,6 +12,7 @@ import { JourneyMap } from '@/components/visuals/journey-map'
 import { CurrentWeekBanner } from '@/components/ui/current-week-banner'
 import { WhyStudy } from '@/components/visuals/why-study'
 import { Roadmap } from '@/components/visuals/roadmap'
+import { StudyArc } from '@/components/visuals/study-arc'
 import { ArchiveBoard } from '@/components/archive/archive-board'
 
 // 마크다운 체크리스트(`- [ ]`)는 remark-gfm이 `<input type="checkbox" disabled>`로
@@ -41,6 +42,7 @@ export function getMDXComponents(components?: MDXComponents) {
     CurrentWeekBanner,
     WhyStudy,
     Roadmap,
+    StudyArc,
     ArchiveBoard,
     ...components,
   } satisfies MDXComponents
