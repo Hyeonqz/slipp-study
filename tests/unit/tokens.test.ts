@@ -134,6 +134,26 @@ describe('Fumadocs 변수 매핑 (와이어링)', () => {
     expect(css).toMatch(/#nd-page\s*\{\s*max-width:\s*none;\s*margin-inline:\s*0;/)
   })
 
+  /**
+   * 사이드바 세로 구분선을 지웠으므로(위 #nd-sidebar 규칙) 경계는 여백이 만든다.
+   * 사이드바가 컬럼이 되는 md(768px)부터만 걸어야 모바일 본문이 안 좁아진다.
+   */
+  it('사이드바가 컬럼이 되는 md 이상에서 본문 왼쪽 여백을 넓힌다', () => {
+    expect(css).toMatch(/@media \(min-width: 768px\) \{\s*#nd-page \{\s*padding-inline-start:\s*40px;/)
+    expect(css).toMatch(/@media \(min-width: 1280px\) \{\s*#nd-page \{\s*padding-inline-start:\s*56px;/)
+  })
+
+  it('그 여백을 미디어 쿼리 밖에 걸지 않는다 — 모바일 본문이 좁아진다', () => {
+    // 미디어 쿼리 안쪽 규칙은 들여쓰기가 있다. 줄 맨 앞에서 시작하는 것만이 전역 규칙이다.
+    const bare = css.match(/^#nd-page \{[^}]*\}/gm) ?? []
+    expect(bare.length, '전역 #nd-page 규칙을 못 찾았다').toBeGreaterThan(0)
+    bare.forEach((block) => {
+      expect(block, `미디어 쿼리 밖 #nd-page 에 padding-inline-start 가 있다: ${block}`).not.toMatch(
+        /padding-inline-start/,
+      )
+    })
+  })
+
   it('산문(.prose 직계 자식)은 720px 로 붙잡는다', () => {
     expect(css).toMatch(/#nd-page \.prose > \*\s*\{\s*max-width:\s*720px;/)
   })

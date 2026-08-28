@@ -219,6 +219,31 @@ time, .tabular { font-variant-numeric: tabular-nums; }
 }
 
 /* ---------------------------------------------------------------------
+ * 사이드바와 본문 사이 여백.
+ *
+ * Fumadocs 기본 패딩은 `px-4 md:px-6 xl:px-8`(16/24/32px)인데, 이건 사이드바가
+ * 세로 구분선을 갖는 기본 테마 기준이다. 이 사이트는 토스 스타일을 따라
+ * `#nd-sidebar { border-color: transparent }`로 그 선을 지웠기 때문에, 32px만으로는
+ * 사이드바 메뉴 글자와 본문 글자가 그냥 붙어 보인다 — 경계를 만들던 게 선이었는데
+ * 선을 지웠으면 그 역할을 여백이 대신해야 한다.
+ *
+ * 사이드바가 실제 컬럼이 되는 지점부터만 건다. fumadocs-ui/dist/layouts/docs/slots/
+ * sidebar.js 의 `md:layout:[--fd-sidebar-width:268px]` 확인 — md(768px) 미만에서는
+ * 사이드바가 드로어라 옆에 아무것도 없고, 거기서 여백을 늘리면 모바일 본문만 좁아진다.
+ * ------------------------------------------------------------------- */
+@media (min-width: 768px) {
+  #nd-page {
+    padding-inline-start: 40px;
+  }
+}
+
+@media (min-width: 1280px) {
+  #nd-page {
+    padding-inline-start: 56px;
+  }
+}
+
+/* ---------------------------------------------------------------------
  * 읽기 폭 720px — 글줄 길이는 화면 폭과 무관하게 고정한다.
  *
  * `.prose`(DocsBody, fumadocs-ui .../page/index.js 의 `cn("prose flex-1")`)의
