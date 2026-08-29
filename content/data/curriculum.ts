@@ -11,6 +11,12 @@ export interface Week {
   deliverable: string
   /** 미리 볼 것 (무료) */
   preread?: string[]
+  /**
+   * 이 회차 모임 날짜 (`YYYY-MM-DD`). 진행자가 손으로 채우는 값이고, 비어 있으면
+   * 화면에서 날짜 줄이 통째로 빠진다 — 일정이 안 정해진 상태가 예외가 아니라
+   * 정상 상태다.
+   */
+  date?: string
 }
 
 /**
@@ -22,48 +28,48 @@ export interface Week {
  */
 export const curriculum: Week[] = [
   {
-    no: 1, stage: 'eye', slug: '01-kickoff', title: '킥오프',
+    no: 1, stage: 'eye', slug: '01-kickoff', title: '킥오프', date: '2026-09-02',
     headline: 'OT + "이 기능은 왜 있을까" 워밍업',
     deliverable: '역기획 ① + 예측 봉인',
   },
   {
-    no: 2, stage: 'eye', slug: '02-reverse-planning-1', title: '어떻게 돈을 버나',
+    no: 2, stage: 'eye', slug: '02-reverse-planning-1', title: '어떻게 돈을 버나', date: '2026-09-16',
     headline: '역기획 ① — 어떻게 돈을 버나 (BM 발표 + 반박, DART 같이 열어보기)',
     deliverable: '역기획 ② (같은 시장 승자/패자 비교)',
     preread: ['SVPG 블로그 글 2편', 'DART에서 대상 회사 감사보고서'],
   },
   {
-    no: 3, stage: 'eye', slug: '03-reverse-planning-2', title: '봉인 개봉',
+    no: 3, stage: 'eye', slug: '03-reverse-planning-2', title: '봉인 개봉', date: '2026-09-30',
     headline: '역기획 ② — 예측 봉인 개봉 / AI 프로덕트 역기획',
     deliverable: 'PRD 1장',
     preread: ['Blake Masters CS183 노트 1~5강', 'Google PAIR 가이드북'],
   },
   {
-    no: 4, stage: 'hand', slug: '04-prd', title: '문제 정의 + PRD',
+    no: 4, stage: 'hand', slug: '04-prd', title: '문제 정의 + PRD', date: '2026-10-14',
     headline: '문제 정의 + PRD 상호 리뷰 / 인터뷰 질문지 제작',
     deliverable: '실제 사람 3~5명 인터뷰 + 기록',
     preread: ['SVPG "Product Discovery"', 'The Mom Test 저자 강연'],
   },
   {
-    no: 5, stage: 'hand', slug: '05-user-interview', title: '유저 인터뷰',
+    no: 5, stage: 'hand', slug: '05-user-interview', title: '유저 인터뷰', date: '2026-10-28',
     headline: '유저 인터뷰 결과 + 유도질문 잡아내기',
     deliverable: '지표 트리 + 우선순위 판단서 (RICE)',
     preread: ['요즘IT 그로스 아티클 1편'],
   },
   {
-    no: 6, stage: 'hand', slug: '06-metrics-priority', title: '지표 · 우선순위',
+    no: 6, stage: 'hand', slug: '06-metrics-priority', title: '지표 · 우선순위', date: '2026-11-11',
     headline: '지표 설계 + 우선순위 / 아이디어 브레인스토밍',
     deliverable: '원페이저 + 검증 착수',
     preread: ["Lenny's Newsletter 무료글 1편"],
   },
   {
-    no: 7, stage: 'head', slug: '07-my-idea', title: '내 아이디어',
+    no: 7, stage: 'head', slug: '07-my-idea', title: '내 아이디어', date: '2026-11-25',
     headline: '내 아이디어 — 전원 공격',
     deliverable: '검증 결과 + AI로만 만든 제안 PPT',
     preread: ['YC "How to talk to users"', '벤 호로위츠 강연'],
   },
   {
-    no: 8, stage: 'head', slug: '08-validation-retro', title: 'AI 사업 제안 + 회고',
+    no: 8, stage: 'head', slug: '08-validation-retro', title: 'AI 사업 제안 + 회고', date: '2026-12-09',
     headline: 'AI만 써서 만든 PPT로 사업 제안 + 8주 전체 회고',
     deliverable: '없음 — 뒤풀이',
   },
@@ -96,4 +102,22 @@ export function weekBySlug(slug: string): Week | undefined {
  */
 export function weekLabel(w: Week): string {
   return `${w.no}회차 — ${w.title}`
+}
+
+const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
+
+/**
+ * `2026-09-02` → `9월 2일 (수)`.
+ *
+ * 요일만 날짜에서 계산한다 — 회차 날짜 자체를 "시작일 + N주"로 자동 계산하지는
+ * 않는다. 일정은 밀리는 게 정상이고, 자동화하면 틀린 값이 화면에 뜬다
+ * (`currentWeek`를 손으로 고치는 것과 같은 이유다).
+ *
+ * UTC로 파싱해 UTC 게터로 읽는다 — `new Date('2026-09-02')`는 UTC 자정이라
+ * 로컬 게터로 읽으면 UTC보다 뒤진 타임존에서 하루 앞으로 밀린다.
+ */
+export function formatWeekDate(date: string): string {
+  const d = new Date(`${date}T00:00:00Z`)
+  if (Number.isNaN(d.getTime())) throw new Error(`회차 날짜 형식이 잘못됐습니다: ${date}`)
+  return `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일 (${DAY_NAMES[d.getUTCDay()]})`
 }

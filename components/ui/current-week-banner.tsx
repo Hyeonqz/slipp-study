@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { curriculum, currentWeek } from '@/content/data/curriculum'
+import { curriculum, currentWeek, formatWeekDate } from '@/content/data/curriculum'
 
 /**
  * 홈 문서 상단에 "지금 여기"를 알리는 배너. currentWeek가 null이면(스터디
@@ -26,7 +26,9 @@ export function CurrentWeekBanner() {
         textDecoration: 'none',
       }}
     >
-      <div style={{ fontSize: 11.5, fontWeight: 800, color: 'var(--blue-text)' }}>이번 주</div>
+      <div style={{ fontSize: 11.5, fontWeight: 800, color: 'var(--blue-text)' }}>
+        이번 주{w.date && ` · ${formatWeekDate(w.date)}`}
+      </div>
       <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--g900)', marginTop: 3 }}>
         {currentWeek}회차 · {w.title}
       </div>

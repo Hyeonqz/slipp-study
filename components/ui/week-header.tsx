@@ -1,4 +1,4 @@
-import { curriculum } from '@/content/data/curriculum'
+import { curriculum, formatWeekDate } from '@/content/data/curriculum'
 import { stageOf } from '@/lib/stage'
 
 /**
@@ -34,6 +34,11 @@ export function WeekHeader({ week }: { week: number }) {
         {stage.emoji} {stage.label}
       </span>
       <span style={badge}>2시간</span>
+      {w.date && (
+        <span className="tabular" style={badge}>
+          {formatWeekDate(w.date)}
+        </span>
+      )}
     </div>
   )
 }
