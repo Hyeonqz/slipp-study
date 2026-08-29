@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { curriculum, currentWeek } from '@/content/data/curriculum'
+import { curriculum, currentWeek, formatWeekDate } from '@/content/data/curriculum'
 import { stageOf } from '@/lib/stage'
 
 /**
@@ -58,6 +58,19 @@ export function PrepList() {
                 {stage.emoji}
               </span>
               <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--g900)' }}>{w.title}</span>
+              {w.date && (
+                <span
+                  className="tabular"
+                  style={{
+                    marginLeft: 'auto',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: isCurrent ? 'var(--blue-text)' : 'var(--g600)',
+                  }}
+                >
+                  {formatWeekDate(w.date)}
+                </span>
+              )}
               {isCurrent && (
                 <span
                   style={{

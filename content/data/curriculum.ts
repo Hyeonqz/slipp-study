@@ -11,6 +11,12 @@ export interface Week {
   deliverable: string
   /** 미리 볼 것 (무료) */
   preread?: string[]
+  /**
+   * 이 회차 모임 날짜 (`YYYY-MM-DD`). 진행자가 손으로 채우는 값이고, 비어 있으면
+   * 화면에서 날짜 줄이 통째로 빠진다 — 일정이 안 정해진 상태가 예외가 아니라
+   * 정상 상태다.
+   */
+  date?: string
 }
 
 /**
@@ -96,4 +102,22 @@ export function weekBySlug(slug: string): Week | undefined {
  */
 export function weekLabel(w: Week): string {
   return `${w.no}회차 — ${w.title}`
+}
+
+const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
+
+/**
+ * `2026-09-02` → `9월 2일 (수)`.
+ *
+ * 요일만 날짜에서 계산한다 — 회차 날짜 자체를 "시작일 + N주"로 자동 계산하지는
+ * 않는다. 일정은 밀리는 게 정상이고, 자동화하면 틀린 값이 화면에 뜬다
+ * (`currentWeek`를 손으로 고치는 것과 같은 이유다).
+ *
+ * UTC로 파싱해 UTC 게터로 읽는다 — `new Date('2026-09-02')`는 UTC 자정이라
+ * 로컬 게터로 읽으면 UTC보다 뒤진 타임존에서 하루 앞으로 밀린다.
+ */
+export function formatWeekDate(date: string): string {
+  const d = new Date(`${date}T00:00:00Z`)
+  if (Number.isNaN(d.getTime())) throw new Error(`회차 날짜 형식이 잘못됐습니다: ${date}`)
+  return `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일 (${DAY_NAMES[d.getUTCDay()]})`
 }
