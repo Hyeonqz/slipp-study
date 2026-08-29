@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { CurrentWeekBanner } from '@/components/ui/current-week-banner'
+import { curriculum, formatWeekDate } from '@/content/data/curriculum'
 
 afterEach(() => vi.resetModules())
 
@@ -23,7 +24,12 @@ describe('<CurrentWeekBanner /> — 진행 중일 때', () => {
     render(<Banner />)
     const link = screen.getByRole('link')
     expect(link).toHaveAttribute('href', '/weeks/04-prd')
-    expect(screen.getByText('이번 주')).toBeInTheDocument()
+    // 날짜가 같은 줄에 붙어 텍스트 노드가 나뉘므로 textContent로 본다(정규식은
+    // `(수)`의 괄호가 그룹이 돼서 안 맞는다). 날짜 값은 curriculum에서 가져온다 —
+    // 일정이 밀려도 테스트가 깨지지 않게.
+    expect(link.textContent).toContain('이번 주')
+    const w4 = curriculum.find((w) => w.no === 4)!
+    if (w4.date) expect(link.textContent).toContain(formatWeekDate(w4.date))
     expect(screen.getByText('4회차 · 문제 정의 + PRD')).toBeInTheDocument()
   })
 })
