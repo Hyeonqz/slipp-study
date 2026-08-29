@@ -34,3 +34,15 @@ describe('start/roadmap.mdx에 <Roadmap />이 실제로 삽입되어 있다', ()
     expect(raw).toMatch(/<StudyArc\s*\/>/)
   })
 })
+
+describe('start/prep.mdx에 <PrepList />가 실제로 삽입되어 있다', () => {
+  it('<PrepList />를 갖는다', () => {
+    const raw = readDoc('prep')
+    expect(raw).toMatch(/<PrepList\s*\/>/)
+  })
+
+  it('제출처(/archive)로 가는 링크를 갖는다 — 만든 다음 어디로 가는지가 이 문서의 마지막 조각이다', () => {
+    const raw = readDoc('prep')
+    expect(raw).toMatch(/\(\/archive\)/)
+  })
+})

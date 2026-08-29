@@ -117,3 +117,17 @@ describe('README.md 산출물 올리는 법에도 MDX 경고가 짧게 반영되
     expect(raw).toMatch(/`\{`/)
   })
 })
+
+/**
+ * 양식 문서를 다 쓴 팀원이 그다음 어디로 가야 하는지가 사이트에 없었다.
+ * 양식 → 아카이브 링크가 그 다리이므로, 다섯 양식 문서 전부에 실제로 있는지
+ * 확인한다(resources.mdx는 제출물이 아니라 자료 목록이라 제외).
+ */
+describe('제출물 양식 문서마다 아카이브로 가는 링크가 있다', () => {
+  const forms = ['reverse-engineering', 'prd', 'interview', 'metrics', 'one-pager']
+  for (const f of forms) {
+    it(`templates/${f}.mdx가 /archive 링크를 갖는다`, () => {
+      expect(readDoc(`content/docs/templates/${f}.mdx`)).toMatch(/\(\/archive\)/)
+    })
+  }
+})
