@@ -53,6 +53,12 @@ describe('회차 날짜', () => {
     expect([...dated].sort()).toEqual(dated)
   })
 
+  it('place는 채웠으면 빈 문자열이 아니다', () => {
+    curriculum.forEach((w) => {
+      if (w.place !== undefined) expect(w.place.trim()).not.toBe('')
+    })
+  })
+
   it('`9월 2일 (수)` 형태로 포맷한다', () => {
     expect(formatWeekDate('2026-09-02')).toBe('9월 2일 (수)')
   })

@@ -20,6 +20,19 @@ describe('<WeekHeader />', () => {
     expect(screen.getByText(/눈 — 역기획/)).toBeInTheDocument()
   })
 
+  it('place가 있는 회차는 장소를 배지로 보여준다', () => {
+    render(<WeekHeader week={2} />)
+    expect(screen.getByText('잠실 스터디룸')).toBeInTheDocument()
+  })
+
+  // 장소가 비어 있는 게 정상 상태다(홈의 기본 장소가 유효하다는 뜻). 빈 배지가
+  // 뜨거나 `undefined`가 그대로 렌더되면 안 된다.
+  it('place가 없는 회차는 장소 배지를 만들지 않는다', () => {
+    const { container } = render(<WeekHeader week={1} />)
+    expect(container.textContent).not.toContain('undefined')
+    expect(container.querySelectorAll('span')).toHaveLength(3)
+  })
+
   it('범위를 벗어난 회차에 대해 던진다', () => {
     expect(() => render(<WeekHeader week={99} />)).toThrow()
   })

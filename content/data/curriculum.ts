@@ -17,6 +17,14 @@ export interface Week {
    * 정상 상태다.
    */
   date?: string
+  /**
+   * 이 회차 모임 장소. 진행자가 손으로 채우는 값이고, 비어 있으면 화면에서
+   * 장소 배지가 빠진다 — `date`와 같은 방식이다.
+   *
+   * 회차마다 다를 때만 적는다. 전체 기본 장소는 홈(`content/docs/index.mdx`)에
+   * 있고, 여기 값은 그 회차에 한해 그것을 대신한다.
+   */
+  place?: string
 }
 
 /**
@@ -34,6 +42,7 @@ export const curriculum: Week[] = [
   },
   {
     no: 2, stage: 'eye', slug: '02-reverse-planning-1', title: '어떻게 돈을 버나', date: '2026-09-16',
+    place: '잠실 스터디룸',
     headline: '역기획 ① — 어떻게 돈을 버나 (BM 발표 + 반박, DART 같이 열어보기)',
     deliverable: '역기획 ② (같은 시장 승자/패자 비교)',
     preread: ['SVPG 블로그 글 2편', 'DART에서 대상 회사 감사보고서'],

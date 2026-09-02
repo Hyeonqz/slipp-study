@@ -39,6 +39,9 @@ export function WeekHeader({ week }: { week: number }) {
           {formatWeekDate(w.date)}
         </span>
       )}
+      {/* 장소는 회차마다 다를 때만 채운다. 비어 있으면 홈의 기본 장소가 유효하다는 뜻이라
+          여기서 배지를 만들지 않는다 — 날짜와 같은 규칙이다. */}
+      {w.place && <span style={badge}>{w.place}</span>}
     </div>
   )
 }
