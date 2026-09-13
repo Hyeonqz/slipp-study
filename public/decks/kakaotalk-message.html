@@ -878,6 +878,9 @@ li strong{color:var(--ink)}
       typed = (now - typedAt < 1000 ? typed : '') + k;
       typedAt = now;
       var n = parseInt(typed, 10);
+      // 5 누르고 바로 8 을 누르면 58 이 돼서 아무 데도 못 간다.
+      // 장 수를 넘기면 방금 누른 숫자로 새로 시작한다.
+      if (n > slides.length) { typed = k; n = parseInt(typed, 10); }
       if (n >= 1 && n <= slides.length) { closeSheet(); go(n - 1); }
       return;
     }
