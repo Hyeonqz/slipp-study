@@ -5,178 +5,269 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>카카오톡 메시지 전송 역기획 — 2회차</title>
 <style>
-  :root{
-    --g50:#F9FAFB; --g100:#F2F4F6; --g200:#E5E8EB; --g300:#D1D6DB;
-    --g600:#5A6874; --g700:#4E5968; --g800:#333D4B; --g900:#191F28;
-    --blue:#3182F6; --blue-text:#1E5FCC; --blue-fill:#1E5FCC; --blue-bg:#E8F3FF;
-    --red:#F04452; --green:#15C26B;
-    --eye:#2C5FA8; --eye-bg:#E8F1FC;
-    --paper:#fff;
-    --r:16px;
-  }
-  @media (prefers-color-scheme:dark){
-    :root:not([data-theme="light"]){
-      --g50:#1E1E24; --g100:#24242C; --g200:#2E2E38; --g300:#3A3A46;
-      --g600:#98A0AB; --g700:#C2C8D0; --g800:#DDE1E6; --g900:#F2F4F6;
-      --blue:#4E93F7; --blue-text:#4E93F7; --blue-fill:#2469DB; --blue-bg:#16233A;
-      --red:#F4707C; --green:#3ED18C;
-      --eye:#8FB6EC; --eye-bg:#1B2B45;
-      --paper:#141419;
-    }
-  }
-  :root[data-theme="dark"]{
-    --g50:#1E1E24; --g100:#24242C; --g200:#2E2E38; --g300:#3A3A46;
-    --g600:#98A0AB; --g700:#C2C8D0; --g800:#DDE1E6; --g900:#F2F4F6;
-    --blue:#4E93F7; --blue-text:#4E93F7; --blue-fill:#2469DB; --blue-bg:#16233A;
-    --red:#F4707C; --green:#3ED18C;
-    --eye:#8FB6EC; --eye-bg:#1B2B45;
-    --paper:#141419;
-  }
+/* ───────────────────────────────────────────────────────────────
+ * 디자인 시스템: docs/DESIGN.md (vercel)
+ * 토큰 이름·값은 그 문서를 따른다. 한글 때문에 의도적으로 어긴 곳은
+ * docs/DESIGN.md 상단 주석에 적어뒀다.
+ *   - 잉크가 곧 강조다. 여섯 번째 액센트를 만들지 않는다.
+ *   - 굵기 상한은 600. 700 이상을 쓰지 않는다.
+ *   - 모노는 코드와 기술 라벨 전용. 본문 문단에 쓰지 않는다.
+ *   - 그림자는 얇게 여러 겹 + 인셋 헤어라인. 무거운 단일 그림자 금지.
+ *   - 이 화면은 nav 스케일 UI다 → 6px 라운드로 통일(마케팅 100px 필 금지).
+ * ─────────────────────────────────────────────────────────────── */
+@font-face{
+  font-family:'Pretendard Variable';
+  src:url('/fonts/PretendardVariable.subset.woff2') format('woff2-variations');
+  font-weight:45 920; font-style:normal; font-display:swap;
+}
 
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;height:100%}
-  body{
-    background:var(--paper); color:var(--g900);
-    font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
+:root{
+  --canvas:#ffffff; --canvas-soft:#fafafa; --canvas-soft-2:#f5f5f5;
+  --hairline:#ebebeb; --hairline-strong:#7d7d7d;
+  /* mute·hairline-strong 은 DESIGN.md 값(#888888/#a1a1a1)이 흰 배경에서 각각
+   * 3.40:1 / 2.48:1 이라 작은 글자에 AA(4.5:1) 미달이다 — 그 값들은 마케팅
+   * 페이지 기준이고 이 덱은 표·캡션이 많다. 같은 그레이 램프에서 단계만
+   * 내려 잡았다(실측: mute 5.27~5.74, hairline-strong 3.94). */
+  --ink:#171717; --body:#4d4d4d; --mute:#666666; --on-primary:#ffffff;
+  --primary:#171717;
+  --link:#0070f3; --link-deep:#0761d1; --link-bg-soft:#d3e5ff;
+  --warning:#f5a623; --warning-soft:#ffefcf; --warning-deep:#ab570a;
+  /* 잉크 면(도식·ok 콜아웃) 위의 보조 톤. 다크에선 면이 밝게 뒤집히므로
+   * 흰색을 하드코딩하면 안 된다 — 실제로 한 번 그렇게 사라졌다. */
+  --on-primary-dim:#ffffffb8; --on-primary-soft:#ffffffd6;
+  --on-primary-line:#ffffff2e; --on-primary-line-strong:#ffffff6b;
+  --on-primary-wash:#ffffff14;
+  --r-ui:6px; --r-card:8px;
+  --shadow:0 1px 1px #00000005, 0 2px 2px #0000000a;
+  --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+}
+/* 다크는 DESIGN.md 에 없다 — 거기서 dark 는 polarity-flip 밴드를 뜻한다.
+ * 역할을 보존해 파생했고 대비는 실측해서 맞췄다. */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --canvas:#0a0a0a; --canvas-soft:#000000; --canvas-soft-2:#171717;
+    --hairline:#2e2e2e; --hairline-strong:#6e6e6e;
+    --ink:#ededed; --body:#a1a1a1; --mute:#8f8f8f; --on-primary:#0a0a0a;
+    --primary:#ededed;
+    --link:#52a8ff; --link-deep:#8cc6ff; --link-bg-soft:#0d2137;
+    --warning:#f5a623; --warning-soft:#2b1f07; --warning-deep:#f5be5c;
+    --on-primary-dim:#0a0a0ab5; --on-primary-soft:#0a0a0ad6;
+    --on-primary-line:#0a0a0a30; --on-primary-line-strong:#0a0a0a75;
+    --on-primary-wash:#0a0a0a14;
   }
+}
+:root[data-theme="dark"]{
+    --canvas:#0a0a0a; --canvas-soft:#000000; --canvas-soft-2:#171717;
+    --hairline:#2e2e2e; --hairline-strong:#6e6e6e;
+    --ink:#ededed; --body:#a1a1a1; --mute:#8f8f8f; --on-primary:#0a0a0a;
+    --primary:#ededed;
+    --link:#52a8ff; --link-deep:#8cc6ff; --link-bg-soft:#0d2137;
+    --warning:#f5a623; --warning-soft:#2b1f07; --warning-deep:#f5be5c;
+    --on-primary-dim:#0a0a0ab5; --on-primary-soft:#0a0a0ad6;
+    --on-primary-line:#0a0a0a30; --on-primary-line-strong:#0a0a0a75;
+    --on-primary-wash:#0a0a0a14;
+}
 
-  #deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory}
-  section{
-    min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
-    display:flex;flex-direction:column;justify-content:center;
-    padding:clamp(28px,5vw,80px) clamp(20px,6vw,96px) clamp(72px,8vh,110px);
-    border-bottom:1px solid var(--g200);
-  }
-  .wrap{width:100%;max-width:1080px;margin-inline:auto}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--canvas-soft); color:var(--ink);
+  font-family:'Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  font-weight:400;-webkit-font-smoothing:antialiased;
+}
 
-  .kicker{
-    display:inline-block;font-size:13px;font-weight:700;letter-spacing:.02em;
-    color:var(--eye);background:var(--eye-bg);
-    padding:6px 12px;border-radius:999px;margin-bottom:20px;
-  }
-  h1{font-size:clamp(32px,6vw,64px);line-height:1.18;letter-spacing:-.03em;margin:0 0 20px;font-weight:800}
-  h2{font-size:clamp(24px,3.6vw,42px);line-height:1.25;letter-spacing:-.025em;margin:0 0 8px;font-weight:800}
-  .sub{font-size:clamp(15px,1.8vw,20px);color:var(--g600);line-height:1.6;margin:0 0 28px;font-weight:500}
-  p{font-size:clamp(15px,1.6vw,18px);line-height:1.75;color:var(--g700);margin:0 0 14px}
-  strong{color:var(--g900);font-weight:700}
-  em{font-style:normal;color:var(--blue-text);font-weight:600}
+#deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory}
+section{
+  min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(24px,4vw,64px) clamp(20px,5vw,80px) clamp(72px,8vh,104px);
+}
+.wrap{width:100%;max-width:1100px;margin-inline:auto}
 
-  .lead{
-    font-size:clamp(19px,2.6vw,30px);line-height:1.55;font-weight:700;
-    color:var(--g900);letter-spacing:-.02em;margin:0 0 24px;
-  }
-  .quiet{color:var(--g600);font-weight:500}
+/* 섹션 eyebrow — 모노가 기술 라벨의 목소리다.
+ * 한글은 스택 뒤쪽 한글 폰트로 자연히 넘어가고 라틴·숫자만 모노로 찍힌다. */
+.kicker{
+  display:block;font-family:var(--mono),'Pretendard Variable',sans-serif;
+  font-size:12px;font-weight:400;line-height:16px;color:var(--mute);
+  margin-bottom:18px;
+}
 
-  .cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:8px}
-  .card{
-    background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);
-    padding:20px 22px;
-  }
-  .card h3{margin:0 0 8px;font-size:16px;font-weight:700;color:var(--g900)}
-  .card p{margin:0;font-size:15px;line-height:1.65}
-  .card .big{font-size:clamp(26px,3.4vw,40px);font-weight:800;letter-spacing:-.03em;color:var(--blue-text);line-height:1.15;margin:0 0 6px;display:block}
-  .card .src{display:block;margin-top:10px;font-size:12px;color:var(--g600)}
+h1{font-size:clamp(30px,5.2vw,54px);line-height:1.14;letter-spacing:-.022em;font-weight:600;margin:0 0 18px}
+h2{font-size:clamp(23px,3.3vw,38px);line-height:1.22;letter-spacing:-.018em;font-weight:600;margin:0 0 8px}
+.sub{font-size:clamp(15px,1.75vw,19px);line-height:1.6;color:var(--body);font-weight:400;margin:0 0 26px}
+p{font-size:clamp(14px,1.55vw,17px);line-height:1.68;color:var(--body);margin:0 0 13px}
+strong{color:var(--ink);font-weight:600}
+em{font-style:normal;color:var(--link-deep);font-weight:500}
+.lead{font-size:clamp(18px,2.3vw,26px);line-height:1.42;letter-spacing:-.014em;font-weight:600;color:var(--ink);margin:0 0 22px}
+.quiet{color:var(--mute);font-weight:400}
 
-  .flow{
-    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-    font-size:clamp(11px,1.35vw,15px);line-height:1.9;white-space:pre;
-    overflow-x:auto;background:var(--g50);border:1px solid var(--g200);
-    border-radius:var(--r);padding:22px 24px;color:var(--g800);margin:0 0 18px;
-  }
+/* 카드 — 흰 캔버스가 회색 페이지 위에 뜬다. 그림자는 얇게 두 겹 + 인셋 링 */
+.cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));margin-top:6px}
+.card{
+  background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-card);
+  padding:20px 22px;box-shadow:var(--shadow);
+}
+.card h3{margin:0 0 10px;font-size:14px;font-weight:500;color:var(--body);letter-spacing:-.01em}
+.card p{margin:0;font-size:14px;line-height:1.6}
+.card .big{
+  display:block;font-size:clamp(24px,3.2vw,38px);font-weight:600;letter-spacing:-.03em;
+  line-height:1.12;color:var(--ink);margin:0 0 8px;font-variant-numeric:tabular-nums;
+}
+.card .src{
+  display:block;margin-top:11px;font-family:var(--mono),sans-serif;
+  font-size:12px;line-height:16px;color:var(--mute);
+}
 
-  table{width:100%;border-collapse:collapse;font-size:clamp(13px,1.5vw,16px);margin:4px 0 16px}
-  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--g200);vertical-align:top;line-height:1.6}
-  th{font-weight:700;color:var(--g600);font-size:13px;letter-spacing:.02em;border-bottom:1.5px solid var(--g300)}
-  td strong{color:var(--g900)}
-  tbody tr:last-child td{border-bottom:none}
+/* 도식 — DESIGN.md 의 code-editor-mockup 자리(잉크 면)를 쓰되, ASCII 아트가 아니라
+ * 실제 레이아웃으로 그린다. 박스 드로잉 문자는 한글이 라틴 2칸 폭이라는 전제에서만
+ * 맞는데 Pretendard 는 가변폭이라 줄이 어긋난다 — 회차가 쌓일수록 매번 깨진다. */
+.diagram{
+  background:var(--primary);color:var(--on-primary);
+  border-radius:var(--r-card);padding:clamp(18px,2.4vw,26px);margin:0 0 18px;
+}
+.dgm-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dgm-node{
+  border:1px solid var(--on-primary-line);border-radius:var(--r-ui);padding:6px 12px;
+  font-size:clamp(13px,1.45vw,15px);font-weight:500;white-space:nowrap;
+}
+.dgm-edge{
+  display:flex;align-items:center;gap:8px;color:var(--on-primary-dim);
+  font-family:var(--mono),sans-serif;font-size:12px;white-space:nowrap;
+}
+.dgm-edge::after{content:"";width:26px;height:1px;background:var(--on-primary-line-strong)}
+.dgm-strong{background:var(--on-primary);color:var(--primary);border-color:transparent;font-weight:600}
+.dgm-stem{
+  margin:10px 0 10px 22px;padding:9px 0 9px 20px;border-left:1px solid var(--on-primary-line-strong);
+  color:var(--on-primary-soft);font-size:clamp(13px,1.45vw,15px);
+}
+.dgm-branch{display:flex;flex-direction:column;gap:7px;min-width:0}
+.dgm-branch p{margin:0;color:var(--on-primary-soft);font-size:clamp(12.5px,1.4vw,14.5px);line-height:1.55}
+.dgm-branch b{color:var(--on-primary);font-weight:600;font-variant-numeric:tabular-nums}
+/* 훅 루프 — 4단계 가로 배열. 좁아지면 세로로 접힌다 */
+.dgm-loop{display:grid;grid-template-columns:repeat(auto-fit,minmax(186px,1fr));gap:12px}
+.dgm-step{border:1px solid var(--on-primary-line);border-radius:var(--r-ui);padding:13px 15px}
+.dgm-step h4{
+  margin:0 0 7px;font-size:clamp(13px,1.45vw,15px);font-weight:600;color:var(--on-primary);
+}
+.dgm-step p{margin:0;color:var(--on-primary-dim);font-size:clamp(12px,1.3vw,13.5px);line-height:1.65}
+.dgm-step.is-engine{background:var(--on-primary-wash);border-color:var(--on-primary-line-strong)}
+.dgm-step.is-engine h4::after{
+  content:"엔진";margin-left:8px;padding:1px 6px;border-radius:4px;
+  background:var(--on-primary);color:var(--primary);
+  font-family:var(--mono),sans-serif;font-size:10.5px;font-weight:400;vertical-align:2px;
+}
 
-  .note{
-    border-left:3px solid var(--blue);background:var(--blue-bg);
-    padding:16px 20px;border-radius:0 var(--r) var(--r) 0;margin:16px 0 0;
-  }
-  .note p{margin:0;color:var(--g800)}
-  .warn{border-left-color:var(--red);background:color-mix(in srgb,var(--red) 10%,transparent)}
-  .ok{border-left-color:var(--green);background:color-mix(in srgb,var(--green) 12%,transparent)}
+/* 표 — 헤더는 모노 캡션, 본문은 body-sm */
+table{width:100%;border-collapse:collapse;font-size:clamp(13px,1.4vw,15px);margin:2px 0 14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--hairline);vertical-align:top;line-height:1.55}
+th{
+  font-family:var(--mono),'Pretendard Variable',sans-serif;
+  font-size:12px;font-weight:400;line-height:16px;color:var(--mute);
+  border-bottom:1px solid var(--hairline-strong);
+}
+td{color:var(--body)}
+td strong{color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
 
-  ol,ul{margin:0 0 14px;padding-left:22px}
-  li{font-size:clamp(15px,1.6vw,18px);line-height:1.75;color:var(--g700);margin-bottom:10px}
-  li::marker{color:var(--blue-text);font-weight:700}
+/* 콜아웃 — DESIGN.md 에 있는 semantic 만 쓴다.
+ * ok 는 새 색을 만들지 않고 polarity-flip(잉크 면)으로 처리한다. */
+.note{background:var(--link-bg-soft);border-left:2px solid var(--link);border-radius:0 var(--r-card) var(--r-card) 0;padding:15px 19px;margin:15px 0 0}
+.note p{margin:0;color:var(--ink)}
+.note.warn{background:var(--warning-soft);border-left-color:var(--warning)}
+.note.warn p{color:var(--warning-deep)}
+.note.warn p strong{color:var(--warning-deep)}
+.note.ok{background:var(--primary);border-left-color:var(--hairline-strong)}
+.note.ok p,.note.ok p strong{color:var(--on-primary)}
 
-  .bar{position:fixed;left:0;right:0;bottom:0;height:3px;background:var(--g200);z-index:20}
-  .bar i{display:block;height:100%;width:0;background:var(--blue);transition:width .25s ease}
-  .hud{
-    position:fixed;right:20px;bottom:18px;z-index:21;display:flex;gap:8px;align-items:center;
-    font-size:13px;font-weight:700;color:var(--g600);
-  }
-  .hud button{
-    font:inherit;cursor:pointer;border:1px solid var(--g200);background:var(--paper);
-    color:var(--g700);border-radius:999px;padding:6px 12px;
-  }
-  .hud button:hover{border-color:var(--blue);color:var(--blue-text)}
-  .hud button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+ol,ul{margin:0 0 13px;padding-left:21px}
+li{font-size:clamp(14px,1.55vw,17px);line-height:1.68;color:var(--body);margin-bottom:9px}
+li::marker{color:var(--mute)}
+li strong{color:var(--ink)}
 
-  /* 720~800px 높이(노트북·구형 프로젝터)에서 한 장이 잘리지 않게 전체를 조인다 */
-  @media (max-height:800px){
-    section{padding-top:clamp(18px,3.5vw,44px);padding-bottom:62px}
-    h2{font-size:clamp(21px,3vw,32px)}
-    .sub{margin-bottom:16px}
-    .lead{font-size:clamp(17px,2.2vw,24px);margin-bottom:16px}
-    p,li{font-size:clamp(13px,1.4vw,16px);line-height:1.6}
-    li{margin-bottom:7px}
-    table{font-size:clamp(13px,1.35vw,15px);margin-bottom:10px}
-    th,td{padding:8px 11px;line-height:1.5}
-    .note{padding:12px 16px;margin-top:10px}
-    .cards{gap:11px}
-    .card{padding:15px 17px}
-    .card .big{font-size:clamp(22px,2.8vw,32px)}
-    .flow{padding:16px 18px;line-height:1.75}
-    .kicker{margin-bottom:14px}
-  }
+/* 진행 바 — 잉크가 채운다. 별도 색을 만들지 않는다 */
+.bar{position:fixed;left:0;right:0;bottom:0;height:2px;background:var(--hairline);z-index:20}
+.bar i{display:block;height:100%;width:0;background:var(--primary);transition:width .2s ease}
 
-  /* 목차 — 22장을 축소한 썸네일은 아무것도 안 읽힌다. 제목 리스트가 실제로 쓸모 있고,
-   * 마침 이 덱의 소재(카카오톡)에서 "전체를 훑는 화면"이 채팅 목록이다. */
-  .sheet{position:fixed;inset:0;z-index:40;background:var(--paper);display:flex;flex-direction:column}
-  .sheet[hidden]{display:none}
-  .sheet-head{
-    display:flex;justify-content:space-between;align-items:baseline;gap:16px;
-    padding:20px clamp(18px,4vw,40px) 14px;border-bottom:1px solid var(--g200);
-  }
-  .sheet-head h2{margin:0;font-size:clamp(19px,2.4vw,26px)}
-  .sheet-head .keys{font-size:12.5px;color:var(--g600);font-weight:500;text-align:right;line-height:1.7}
-  .sheet-head kbd{
-    font:inherit;font-weight:700;background:var(--g100);border:1px solid var(--g200);
-    border-radius:5px;padding:1px 6px;color:var(--g700);
-  }
-  .sheet-list{overflow-y:auto;padding:10px clamp(12px,3vw,32px) 28px;flex:1}
-  .row{
-    display:flex;align-items:baseline;gap:14px;width:100%;text-align:left;
-    font:inherit;color:var(--g800);background:none;border:0;cursor:pointer;
-    padding:11px 14px;border-radius:var(--r-item);
-  }
-  .row + .row{box-shadow:0 -1px 0 var(--g100)}
-  .row:hover{background:var(--g50)}
-  .row:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
-  .row[aria-current="true"]{background:var(--blue-bg)}
-  .row[aria-current="true"] .t{color:var(--blue-text);font-weight:700}
-  .row .n{
-    flex:none;min-width:26px;height:22px;padding:0 7px;border-radius:var(--r-pill);
-    background:var(--g100);color:var(--g600);
-    font-size:12.5px;font-weight:700;line-height:22px;text-align:center;
-  }
-  .row[aria-current="true"] .n{background:var(--blue-fill);color:#fff}
-  .row .t{flex:1;font-size:clamp(14px,1.6vw,17px);line-height:1.45;font-weight:600}
-  .row .k{flex:none;font-size:12.5px;color:var(--g600);font-weight:500}
-  @media (max-width:620px){.row .k{display:none}}
-  .divider{
-    display:flex;align-items:center;gap:12px;
-    margin:14px 14px 6px;font-size:12.5px;font-weight:700;color:var(--g600);
-  }
-  .divider::after{content:"";flex:1;height:1px;background:var(--g200)}
+.hud{position:fixed;right:20px;bottom:16px;z-index:21;display:flex;gap:8px;align-items:center}
+.hud button{
+  font:inherit;font-size:14px;font-weight:500;line-height:20px;cursor:pointer;
+  border:1px solid var(--hairline);background:var(--canvas);color:var(--body);
+  border-radius:var(--r-ui);padding:6px 12px;box-shadow:var(--shadow);
+}
+.hud button:hover{border-color:var(--hairline-strong);color:var(--ink)}
+.hud button:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+#count{
+  font-family:var(--mono),sans-serif;font-size:13px;color:var(--mute);
+  font-variant-numeric:tabular-nums;padding:0 2px;
+}
+.hint{position:fixed;left:20px;bottom:18px;z-index:21;font-size:12px;line-height:16px;color:var(--mute)}
+@media (max-width:680px){.hint{display:none}}
 
-  .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-  .hint{position:fixed;left:20px;bottom:18px;z-index:21;font-size:12px;color:var(--g600);font-weight:500}
-  @media (max-width:640px){.hint{display:none}}
+/* 목차 — 22장을 축소하면 안 읽힌다. 제목 리스트가 실제로 쓸모 있고,
+ * 마침 이 덱의 소재(카카오톡)에서 전체를 훑는 화면이 채팅 목록이다. */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--canvas-soft);display:flex;flex-direction:column}
+.sheet[hidden]{display:none}
+.sheet-head{
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  padding:22px clamp(18px,4vw,40px) 15px;border-bottom:1px solid var(--hairline);
+}
+.sheet-head h2{margin:0;font-size:clamp(19px,2.3vw,26px)}
+.sheet-head .keys{margin:0;font-size:12px;line-height:1.75;color:var(--mute);text-align:right}
+.sheet-head kbd{
+  font-family:var(--mono),monospace;font-size:11px;background:var(--canvas-soft-2);
+  border:1px solid var(--hairline);border-radius:4px;padding:1px 5px;color:var(--body);
+}
+.sheet-list{overflow-y:auto;padding:10px clamp(12px,3vw,32px) 28px;flex:1}
+.row{
+  display:flex;align-items:baseline;gap:14px;width:100%;text-align:left;
+  font:inherit;color:var(--body);background:none;border:0;cursor:pointer;
+  padding:11px 13px;border-radius:var(--r-ui);
+}
+.row + .row{box-shadow:0 -1px 0 var(--hairline)}
+.row:hover{background:var(--canvas-soft-2)}
+.row:focus-visible{outline:2px solid var(--link);outline-offset:-2px}
+.row[aria-current="true"]{background:var(--primary)}
+.row[aria-current="true"] .t{color:var(--on-primary);font-weight:500}
+.row[aria-current="true"] .k{color:var(--on-primary);opacity:.72}
+.row .n{
+  flex:none;min-width:26px;height:20px;padding:0 6px;border-radius:4px;
+  background:var(--canvas-soft-2);color:var(--mute);
+  font-family:var(--mono),sans-serif;font-size:12px;line-height:20px;text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.row[aria-current="true"] .n{background:var(--on-primary);color:var(--primary)}
+.row .t{flex:1;font-size:clamp(14px,1.5vw,16px);line-height:1.45;color:var(--ink)}
+.row .k{flex:none;font-family:var(--mono),sans-serif;font-size:12px;color:var(--mute)}
+@media (max-width:620px){.row .k{display:none}}
+.divider{
+  display:flex;align-items:center;gap:12px;margin:16px 13px 6px;
+  font-family:var(--mono),'Pretendard Variable',sans-serif;
+  font-size:12px;line-height:16px;color:var(--mute);
+}
+.divider::after{content:"";flex:1;height:1px;background:var(--hairline)}
+
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* 720~800px 높이(노트북·구형 프로젝터)에서 한 장이 잘리지 않게 조인다 */
+@media (max-height:800px){
+  section{padding-top:clamp(16px,3vw,40px);padding-bottom:60px}
+  .kicker{margin-bottom:13px}
+  h2{font-size:clamp(21px,2.9vw,32px)}
+  .sub{margin-bottom:15px;font-size:clamp(14px,1.6vw,17px)}
+  .lead{font-size:clamp(17px,2.1vw,23px);margin-bottom:15px}
+  p,li{font-size:clamp(13px,1.45vw,16px);line-height:1.58}
+  li{margin-bottom:7px}
+  table{font-size:clamp(12.5px,1.35vw,14px);margin-bottom:10px}
+  th,td{padding:8px 11px;line-height:1.48}
+  .note{padding:12px 16px;margin-top:11px}
+  .cards{gap:11px}
+  .card{padding:15px 17px}
+  .card .big{font-size:clamp(22px,2.7vw,32px)}
+  .diagram{padding:15px 17px}
+  .dgm-stem{margin:8px 0 8px 20px;padding:7px 0 7px 18px}
+  .dgm-step{padding:11px 13px}
+}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 </head>
 <body>
@@ -230,13 +321,22 @@
     <span class="kicker">역기획 2</span>
     <h2>돈이 흐르는 경로</h2>
     <p class="sub">팔리는 건 메시지가 아니라 <strong>수신함이라는 상태</strong>입니다.</p>
-<div class="flow">개인 유저 ─── 메시지 전송 ──▶  0원  (15년째)
-                                │
-                     "5천만 명이 하루 종일 열어보는 수신함"
-                                │
-기업 ─── 알림톡      8원/건 ────┘   정보성 · 광고 금지 · 친구 아니어도 발송
-     ─── 브랜드메시지 22원/건        광고성 · 채널 친구 대상
-     ─── 비즈보드(광고) · 선물하기(거래)</div>
+<div class="diagram">
+      <div class="dgm-row">
+        <span class="dgm-node">개인 유저</span>
+        <span class="dgm-edge">메시지 전송</span>
+        <span class="dgm-node dgm-strong">0원 · 15년째</span>
+      </div>
+      <p class="dgm-stem">"5천만 명이 하루 종일 열어보는 수신함"이라는 상태</p>
+      <div class="dgm-row">
+        <span class="dgm-node">기업</span>
+        <div class="dgm-branch">
+          <p><b>알림톡 8원/건</b> — 정보성 · 광고 금지 · 친구 아니어도 발송</p>
+          <p><b>브랜드메시지 22원/건</b> — 광고성 · 채널 친구 대상</p>
+          <p>비즈보드(광고) · 선물하기(거래)</p>
+        </div>
+      </div>
+    </div>
     <div class="note">
       <p><strong>단가 차이가 곧 "유저의 수신함을 얼마나 침범하는가"의 가격표입니다.</strong>
       개인 메시지가 무료여야 수신함이 신성해지고, 수신함이 신성해야 기업 메시지가 비싸게 팔립니다.
@@ -502,10 +602,12 @@
   <div class="wrap">
     <span class="kicker">기법 2 — Hooked</span>
     <h2>왜 하루에 수십 번 다시 여는가</h2>
-<div class="flow">트리거 ─────────▶ 행동 ─────────▶ 가변 보상 ─────────▶ 투자
-빨간 뱃지 숫자     한 줄 입력 후      답장이 올지 안 올지    대화방 기록이 쌓임
-푸시 알림          엔터 (1초)        언제 올지 모른다       친구목록 · 프로필
-"1"이 안 사라짐                      ▲ 여기가 엔진          읽음이 만든 채무감</div>
+<div class="diagram dgm-loop">
+      <div class="dgm-step"><h4>트리거</h4><p>빨간 뱃지 숫자<br>푸시 알림<br>"1"이 안 사라짐</p></div>
+      <div class="dgm-step"><h4>행동</h4><p>한 줄 입력 후<br>엔터 (1초)</p></div>
+      <div class="dgm-step is-engine"><h4>가변 보상</h4><p>답장이 올지 안 올지<br>언제 올지 모른다</p></div>
+      <div class="dgm-step"><h4>투자</h4><p>대화방 기록이 쌓임<br>친구목록 · 프로필<br>읽음이 만든 채무감</p></div>
+    </div>
     <p><strong>핵심은 가변 보상 칸입니다.</strong> 답장이 <em>확실히 온다면</em> 중독성이 없습니다.
     올지 안 올지, 언제 올지 모르는 것이 계속 열어보게 만듭니다.</p>
     <div class="note">
@@ -631,11 +733,11 @@
 
 </div>
 
-<div class="bar"><i id="prog"></i></div>
+
 <div class="sheet" id="sheet" hidden aria-label="목차">
   <div class="sheet-head">
     <h2>목차</h2>
-    <p class="keys"><kbd>O</kbd> 목차 · <kbd>F</kbd> 전체화면 · <kbd>←</kbd><kbd>→</kbd> 넘기기<br>
+    <p class="keys"><kbd>O</kbd> 목차 · <kbd>F</kbd> 전체화면 · <kbd>&larr;</kbd><kbd>&rarr;</kbd> 넘기기<br>
     숫자를 입력하면 그 장으로 갑니다</p>
   </div>
   <div class="sheet-list" id="sheetList"></div>
@@ -645,11 +747,11 @@
 <div class="hud">
   <button id="toc">목차</button>
   <button id="theme">밝게</button>
-  <button id="prev" aria-label="이전 장">◀</button>
+  <button id="prev" aria-label="이전 장">&larr;</button>
   <span id="count">1 / 1</span>
-  <button id="next" aria-label="다음 장">▶</button>
+  <button id="next" aria-label="다음 장">&rarr;</button>
 </div>
-<div class="hint">← → 로 넘기고, O 로 목차를 열어요</div>
+<div class="hint">&larr; &rarr; 로 넘기고, O 로 목차를 열어요</div>
 <p id="live" aria-live="polite" class="sr"></p>
 
 <script>
@@ -668,7 +770,7 @@
   function titleOf(s){
     var h = s.querySelector('h1,h2');
     if (!h) return '(제목 없음)';
-    // textContent는 <br>을 공백 없이 이어붙여 "카카오톡은메시지를"처럼 된다
+    // textContent 는 <br> 을 공백 없이 이어붙여 "카카오톡은메시지를"처럼 된다
     var t = h.innerText || h.textContent.replace(/\s+/g, ' ');
     return t.replace(/\s+/g, ' ').trim();
   }
@@ -677,7 +779,6 @@
     return k ? k.textContent.trim() : '';
   }
 
-  /* ---- 목차: 22장을 축소하면 안 읽히므로 제목 리스트로 만든다 ---- */
   slides.forEach(function(s, n){
     var b = document.createElement('button');
     b.className = 'row';
@@ -687,8 +788,8 @@
     b.querySelector('.k').textContent = kickerOf(s);
     b.addEventListener('click', function(){ closeSheet(); go(n); });
     list.appendChild(b);
-    // 2회차 양식은 역기획 1~4번까지다. 10장부터(예측 봉인·리스크·개선안·기법)는
-    // 발표가 아니라 반박 타임에 질문이 들어올 때 꺼내 쓰는 카드다.
+    // 2회차 양식은 역기획 1~4번까지다. 10장부터는 발표가 아니라
+    // 반박 타임에 질문이 들어올 때 꺼내 쓰는 카드다.
     if (n + 1 === BREAK_AFTER) {
       var d = document.createElement('p');
       d.className = 'divider';
@@ -709,8 +810,7 @@
     i = Math.max(0, Math.min(slides.length - 1, n));
     var target = slides[i].offsetTop - deck.offsetTop;
     deck.scrollTop = target;
-    // 첫 페인트 직후엔 레이아웃이 아직 안 굳어서 offsetTop이 밀릴 수 있다.
-    // (로드 직후 목차에서 바로 점프하면 한 장 어긋나는 걸 실제로 봤다.)
+    // 첫 페인트 직후엔 레이아웃이 아직 안 굳어서 offsetTop 이 밀릴 수 있다
     requestAnimationFrame(function(){
       var t = slides[i].offsetTop - deck.offsetTop;
       if (Math.abs(deck.scrollTop - t) > 1) deck.scrollTop = t;
@@ -719,27 +819,23 @@
     paint();
   }
 
+  function sheetOpen(){ return !sheet.hidden; }
   function openSheet(){
     sheet.hidden = false;
     var r = rows[i] || rows[0];
     r.scrollIntoView({block:'center'});
     r.focus();
   }
-  function closeSheet(){
-    sheet.hidden = true;
-  }
-  function sheetOpen(){ return !sheet.hidden; }
-
+  function closeSheet(){ sheet.hidden = true; }
   document.getElementById('toc').addEventListener('click', function(){
     sheetOpen() ? closeSheet() : openSheet();
   });
 
-  /* ---- 밝기: 빔프로젝터에선 다크가 죽고, 밝은 방에선 라이트가 낫다 ---- */
+  /* 밝기 — 빔프로젝터에선 다크가 죽고, 밝은 방에선 라이트가 낫다 */
   function applyTheme(t){
     if (t) document.documentElement.setAttribute('data-theme', t);
     else document.documentElement.removeAttribute('data-theme');
-    var dark = t ? t === 'dark'
-                 : matchMedia('(prefers-color-scheme: dark)').matches;
+    var dark = t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
     themeBtn.textContent = dark ? '밝게' : '어둡게';
   }
   var saved = null;
@@ -760,7 +856,7 @@
   }
 
   deck.addEventListener('scroll', function(){
-    if (!deck.clientHeight) return;   // 뷰포트 높이가 0이면 나눗셈이 Infinity가 된다
+    if (!deck.clientHeight) return;   // 뷰포트 높이가 0이면 나눗셈이 Infinity 가 된다
     var n = Math.round(deck.scrollTop / deck.clientHeight);
     n = Math.max(0, Math.min(slides.length - 1, n));
     if (n !== i) { i = n; paint(); }
@@ -772,11 +868,10 @@
   document.addEventListener('keydown', function(e){
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     var k = e.key;
-
-    if (k === 'Escape') { e.preventDefault(); sheetOpen() ? closeSheet() : openSheet(); return; }
-    if (k === 'o' || k === 'O' || k === 'ㅐ') { e.preventDefault(); sheetOpen() ? closeSheet() : openSheet(); return; }
-    if (k === 'f' || k === 'F' || k === 'ㄹ') { e.preventDefault(); toggleFullscreen(); return; }
-
+    if (k === 'Escape' || k === 'o' || k === 'O' || k === '\u3150') {
+      e.preventDefault(); sheetOpen() ? closeSheet() : openSheet(); return;
+    }
+    if (k === 'f' || k === 'F' || k === '\u3139') { e.preventDefault(); toggleFullscreen(); return; }
     // 숫자를 이어 치면 그 장으로 (1초 안에 입력한 것만 한 묶음)
     if (k >= '0' && k <= '9') {
       var now = Date.now();
@@ -786,7 +881,6 @@
       if (n >= 1 && n <= slides.length) { closeSheet(); go(n - 1); }
       return;
     }
-
     if (sheetOpen()) return;   // 목차가 열려 있으면 화살표는 목록 탐색에 맡긴다
     if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(i + 1); }
     else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); go(i - 1); }
@@ -795,8 +889,7 @@
   });
 
   // 새로고침해도 자리를 지키고, 특정 장 링크를 보낼 수 있게 한다.
-  // 이미 덱을 열어둔 상태에서 #13 같은 주소를 붙여넣어도 이동해야 하므로
-  // 최초 1회만 읽지 않고 hashchange도 듣는다.
+  // 이미 덱을 열어둔 상태에서 #13 을 붙여넣어도 이동해야 하므로 hashchange 도 듣는다.
   function fromHash(){
     var n = parseInt((location.hash || '').slice(1), 10);
     return (n >= 1 && n <= slides.length) ? n - 1 : null;
