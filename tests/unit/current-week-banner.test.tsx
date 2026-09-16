@@ -6,8 +6,17 @@ import { curriculum, formatWeekDate } from '@/content/data/curriculum'
 afterEach(() => vi.resetModules())
 
 describe('<CurrentWeekBanner />', () => {
-  it('currentWeek가 null이면 아무것도 그리지 않는다', () => {
-    const { container } = render(<CurrentWeekBanner />)
+  it('currentWeek가 null이면 아무것도 그리지 않는다', async () => {
+    // 모듈의 실제 값에 기대면 진행자가 회차를 올릴 때마다 이 테스트가 깨진다.
+    // currentWeek는 매주 손으로 바뀌는 값이므로 주입해서 본다.
+    vi.doMock('@/content/data/curriculum', async () => {
+      const actual = await vi.importActual<typeof import('@/content/data/curriculum')>(
+        '@/content/data/curriculum',
+      )
+      return { ...actual, currentWeek: null }
+    })
+    const { CurrentWeekBanner: Banner } = await import('@/components/ui/current-week-banner')
+    const { container } = render(<Banner />)
     expect(container).toBeEmptyDOMElement()
   })
 })

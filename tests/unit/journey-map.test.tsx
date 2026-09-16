@@ -28,8 +28,16 @@ describe('<JourneyMap />', () => {
     expect(screen.getAllByText('🧠')).toHaveLength(2)
   })
 
-  it('currentWeek가 null이면 현재 위치 마커가 없다', () => {
-    render(<JourneyMap />)
+  it('currentWeek가 null이면 현재 위치 마커가 없다', async () => {
+    // 위와 같은 이유로 주입해서 본다 — 모듈의 실제 값에 기대지 않는다.
+    vi.doMock('@/content/data/curriculum', async () => {
+      const actual = await vi.importActual<typeof import('@/content/data/curriculum')>(
+        '@/content/data/curriculum',
+      )
+      return { ...actual, currentWeek: null }
+    })
+    const { JourneyMap: Map } = await import('@/components/visuals/journey-map')
+    render(<Map />)
     expect(screen.queryByText('이번 주')).not.toBeInTheDocument()
   })
 

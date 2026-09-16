@@ -92,7 +92,7 @@ export const curriculum: Week[] = [
  *
  * 이 값 하나가 사이드바 `이번 주` 배지 · 홈 배너 · 여정 맵 현재 위치 마커를 만든다.
  */
-export const currentWeek: number | null = null
+export const currentWeek: number | null = 3
 
 export function weekBySlug(slug: string): Week | undefined {
   return curriculum.find((w) => w.slug === slug)
