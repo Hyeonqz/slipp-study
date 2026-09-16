@@ -34,6 +34,14 @@ export interface Week {
  * 옮겨 적었다. 커리큘럼이 바뀌면 이 배열 하나만 고치면 된다 — README는 문서로서
  * 남아있지만, 사이트에 나타나는 값은 전부 여기서 나온다.
  */
+/**
+ * 주제는 진행하면서 바뀐다. 3회차가 "같은 시장 승/패 비교"에서 "망하거나 밀린
+ * 서비스 리포트"로 통째로 바뀐 게 실제 사례다 — 팀 배정까지 없어졌다.
+ *
+ * 바뀌면 **여기와 회차 문서(`content/docs/weeks/`) 둘 다** 고쳐야 한다.
+ * `title`은 `weekLabel()`을 거쳐 회차 문서 frontmatter의 `title`과 글자 그대로
+ * 같아야 하고, 어긋나면 `tests/unit/sidebar.test.ts`가 잡는다.
+ */
 export const curriculum: Week[] = [
   {
     no: 1, stage: 'eye', slug: '01-kickoff', title: '킥오프', date: '2026-09-02',
@@ -44,12 +52,12 @@ export const curriculum: Week[] = [
     no: 2, stage: 'eye', slug: '02-reverse-planning-1', title: '어떻게 돈을 버나', date: '2026-09-16',
     place: '잠실 스터디룸',
     headline: '역기획 ① — 어떻게 돈을 버나 (BM 발표 + 반박, DART 같이 열어보기)',
-    deliverable: '역기획 ② (같은 시장 승자/패자 비교)',
+    deliverable: '망하거나 밀린 서비스 리포트 1편',
     preread: ['SVPG 블로그 글 2편', 'DART에서 대상 회사 감사보고서'],
   },
   {
-    no: 3, stage: 'eye', slug: '03-reverse-planning-2', title: '봉인 개봉', date: '2026-09-30',
-    headline: '역기획 ② — 예측 봉인 개봉 / AI 프로덕트 역기획',
+    no: 3, stage: 'eye', slug: '03-reverse-planning-2', title: '왜 밀렸나', date: '2026-09-30',
+    headline: '망하거나 밀린 서비스 리포트 + 예측 봉인 개봉 / AI 프로덕트 역기획',
     deliverable: 'PRD 1장',
     preread: ['Blake Masters CS183 노트 1~5강', 'Google PAIR 가이드북'],
   },
