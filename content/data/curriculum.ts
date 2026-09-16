@@ -56,7 +56,7 @@ export const curriculum: Week[] = [
     preread: ['SVPG 블로그 글 2편', 'DART에서 대상 회사 감사보고서'],
   },
   {
-    no: 3, stage: 'eye', slug: '03-reverse-planning-2', title: '왜 밀렸나', date: '2026-09-30',
+    no: 3, stage: 'eye', slug: '03-reverse-planning-2', title: '왜 서비스 규모가 축소하고, 사업을 접었나', date: '2026-09-30',
     headline: '망하거나 밀린 서비스 리포트 + 예측 봉인 개봉 / AI 프로덕트 역기획',
     deliverable: 'PRD 1장',
     preread: ['Blake Masters CS183 노트 1~5강', 'Google PAIR 가이드북'],
