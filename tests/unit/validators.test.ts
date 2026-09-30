@@ -172,7 +172,7 @@ describe('checkInternalLinks', () => {
 
   it('이미지 등 정적 자산 링크는 페이지 링크로 취급하지 않는다', () => {
     expect(
-      checkInternalLinks('a.mdx', '![로고](/images/logo.png)', urls),
+      checkInternalLinks('a.mdx', '![로고](/images/logo.png) [발표자료](/decks/weeat-reverse-planning.html)', urls),
     ).toEqual([])
   })
 })

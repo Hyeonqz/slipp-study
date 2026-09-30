@@ -58,20 +58,18 @@ export const curriculum: Week[] = [
   {
     no: 3, stage: 'eye', slug: '03-reverse-planning-2', title: '왜 서비스 규모가 축소하고, 사업을 접었나', date: '2026-09-30',
     headline: '망하거나 밀린 서비스 리포트 + 예측 봉인 개봉 / AI 프로덕트 역기획',
-    deliverable: 'PRD 1장',
+    deliverable: '직접 겪은 서비스 불편과 개선·설득 제안 문서',
     preread: ['Blake Masters CS183 노트 1~5강', 'Google PAIR 가이드북'],
   },
   {
-    no: 4, stage: 'hand', slug: '04-prd', title: '문제 정의 + PRD', date: '2026-10-14',
-    headline: '문제 정의 + PRD 상호 리뷰 / 인터뷰 질문지 제작',
-    deliverable: '실제 사람 3~5명 인터뷰 + 기록',
-    preread: ['SVPG "Product Discovery"', 'The Mom Test 저자 강연'],
+    no: 4, stage: 'hand', slug: '04-prd', title: '서비스 개선 제안', date: '2026-10-14',
+    headline: '직접 겪은 불편을 개선 제안 문서로 만들고, 사용자·기업 관점에서 설득하기',
+    deliverable: '기업에 개선 제안 전달 + 발송·답변·미응답 기록',
   },
   {
-    no: 5, stage: 'hand', slug: '05-user-interview', title: '유저 인터뷰', date: '2026-10-28',
-    headline: '유저 인터뷰 결과 + 유도질문 잡아내기',
+    no: 5, stage: 'hand', slug: '05-user-interview', title: '기업 제안과 피드백', date: '2026-10-28',
+    headline: '실제 기업에 전달한 제안과 반응을 공유하고, 개선으로 연결할 다음 행동 토론하기',
     deliverable: '지표 트리 + 우선순위 판단서 (RICE)',
-    preread: ['요즘IT 그로스 아티클 1편'],
   },
   {
     no: 6, stage: 'hand', slug: '06-metrics-priority', title: '지표 · 우선순위', date: '2026-11-11',

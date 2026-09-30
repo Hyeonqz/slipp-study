@@ -156,7 +156,7 @@ function normalizeUrl(href: string): string {
 
 /** 페이지가 아닌 정적 자산(이미지 등) 링크는 URL 집합 검사 대상이 아니다. */
 const ASSET_EXTENSION_RE =
-  /\.(png|jpe?g|gif|svg|webp|avif|ico|pdf|mp4|webm|mp3|json|css|js|mjs|woff2?|ttf|eot)$/i
+  /\.(png|jpe?g|gif|svg|webp|avif|ico|pdf|html|mp4|webm|mp3|json|css|js|mjs|woff2?|ttf|eot)$/i
 
 export function checkInternalLinks(file: string, body: string, urls: Set<string>): Issue[] {
   const issues: Issue[] = []

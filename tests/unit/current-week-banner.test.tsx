@@ -39,6 +39,6 @@ describe('<CurrentWeekBanner /> — 진행 중일 때', () => {
     expect(link.textContent).toContain('이번 주')
     const w4 = curriculum.find((w) => w.no === 4)!
     if (w4.date) expect(link.textContent).toContain(formatWeekDate(w4.date))
-    expect(screen.getByText('4회차 · 문제 정의 + PRD')).toBeInTheDocument()
+    expect(screen.getByText(`${w4.no}회차 · ${w4.title}`)).toBeInTheDocument()
   })
 })
